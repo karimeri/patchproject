@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <!-- Fill field Return Items Information and click Submit -->
+    <actionGroup name="StorefrontFillReturnItemActionGroup">
+        <arguments>
+            <argument name="attributeCode" type="string"/>
+            <argument name="item"/>
+        </arguments>
+        <fillField selector="{{StorefrontCustomerReturnSection.quantityToReturn('0')}}" userInput="{{item.qty}}" stepKey="fillFieldQuantityReturn"/>
+        <selectOption selector="{{StorefrontCustomerReturnSection.resolution('0')}}" userInput="{{item.resolution}}" stepKey="selectResolution"/>
+        <selectOption selector="{{StorefrontCustomerReturnSection.condition('0')}}" userInput="{{item.condition}}" stepKey="selectCondition"/>
+        <selectOption selector="{{StorefrontCustomerReturnSection.reason('0')}}" userInput="{{item.reason}}" stepKey="selectReason"/>
+        <selectOption selector="{{StorefrontCustomerReturnSection.newAttribute('0', attributeCode)}}" userInput="{{item.new_attribute}}" stepKey="selectNewAttribute"/>
+        <click selector="{{StorefrontCustomerReturnSection.submit}}" stepKey="clickSubmit"/>
+    </actionGroup>
+
+    <!-- See Return Items Information -->
+    <actionGroup name="StorefrontVerifyReturnItemInformationActionGroup">
+        <arguments>
+            <argument name="product"/>
+            <argument name="attribute"/>
+            <argument name="item"/>
+        </arguments>
+        <see selector="{{StorefrontCustomerReturnViewSection.returnItemCell('Product Name')}}" userInput="{{product.name}}" stepKey="seeProductName"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.returnItemCell('SKU')}}" userInput="{{product.sku}}" stepKey="seeSku"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.returnItemCell('Condition')}}" userInput="{{item.condition}}" stepKey="seeCondition"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.returnItemCell('Resolution')}}" userInput="{{item.resolution}}" stepKey="seeResolution"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.returnItemCell('Request Qty')}}" userInput="{{item.qty_requested}}" stepKey="seeRequestQty"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.returnItemCell('Qty')}}" userInput="{{item.qty}}" stepKey="seeQty"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.returnItemCell('Status')}}" userInput="{{item.status}}" stepKey="seeStatus"/>
+        <click selector="{{StorefrontCustomerReturnViewSection.showDetails}}" stepKey="clickShowDetails"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.questions}}" userInput="{{attribute.frontend_label[0]}}" stepKey="seeQuestions"/>
+        <see selector="{{StorefrontCustomerReturnViewSection.answers}}" userInput="{{item.new_attribute}}" stepKey="seeAnswers"/>
+    </actionGroup>
+</actionGroups>

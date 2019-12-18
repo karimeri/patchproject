@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="CreateNewReturnAttribute">
+        <arguments>
+            <argument name="attribute" defaultValue="DropdownReturnAttribute"/>
+        </arguments>
+        <amOnPage url="{{AdminReturnAttributePage.url}}" stepKey="amOnReturnAttributePage"/>
+        <click selector="{{AdminReturnAttributeSection.add}}" stepKey="clickAddNewAttribute"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <seeInCurrentUrl url="{{AdminAddNewReturnAttributePage.url}}" stepKey="seeNewReturnAttributePage"/>
+        <fillField userInput="{{attribute.label}}" selector="{{AdminReturnAttributePropertiesSection.label}}" stepKey="fillAttributeLabel"/>
+        <fillField userInput="{{attribute.attribute_code}}" selector="{{AdminReturnAttributePropertiesSection.attributeCode}}" stepKey="fillAttributeCode"/>
+        <selectOption userInput="{{attribute.input_type}}" selector="{{AdminReturnAttributePropertiesSection.inputType}}" stepKey="selectInputType"/>
+        <selectOption userInput="{{attribute.is_required_value}}" selector="{{AdminReturnAttributePropertiesSection.isRequiredValue}}" stepKey="selectIsValueRequired"/>
+        <selectOption userInput="{{attribute.is_visible}}" selector="{{AdminReturnAttributePropertiesSection.isVisible}}" stepKey="selectIsValueVisible"/>
+        <fillField userInput="{{attribute.sort_order}}" selector="{{AdminReturnAttributePropertiesSection.sortOrder}}" stepKey="fillAttributeSortOrder"/>
+        <selectOption userInput="{{attribute.used_in_forms}}" selector="{{AdminReturnAttributePropertiesSection.usedInForms}}" stepKey="selectUsedInForms"/>
+        <click selector="{{AdminReturnAttributeOptionSection.manageOptions}}" stepKey="clickOnManageOptions"/>
+        <click selector="{{AdminReturnAttributeOptionSection.addOption}}" stepKey="clickOnAddOption"/>
+        <fillField userInput="{{attribute.option_name}}" selector="{{AdminReturnAttributeOptionSection.optionName('0','0')}}" stepKey="fillOptionName"/>
+        <click selector="{{AdminReturnAttributeSection.save}}" stepKey="save"/>
+        <waitForPageLoad stepKey="waitForSaving"/>
+        <see userInput="You saved the RMA item attribute." selector="{{AdminReturnAttributeSection.successMessage}}" stepKey="successMessage"/>
+    </actionGroup>
+
+    <actionGroup name="DeleteReturnAttribute">
+        <arguments>
+            <argument name="attributeCode" defaultValue="DropdownReturnAttribute.attribute_code"/>
+        </arguments>
+        <amOnPage url="{{AdminReturnAttributePage.url}}" stepKey="amOnReturnAttributePage"/>
+        <click selector="{{AdminReturnAttributeSection.resetFilter}}" stepKey="resetFilter"/>
+        <fillField userInput="{{attributeCode}}" selector="{{AdminReturnAttributeSection.attributeCode}}" stepKey="searchByAttributeCode"/>
+        <click selector="{{AdminReturnAttributeSection.search}}" stepKey="search"/>
+        <click selector="{{AdminReturnAttributeSection.foundAttribute('1')}}" stepKey="clickOnAttribute"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <click selector="{{AdminReturnAttributeSection.delete}}" stepKey="clickOnDelete"/>
+        <waitForLoadingMaskToDisappear stepKey="waitForLoadingMaskToDisappear"/>
+        <click selector="{{AdminReturnAttributeSection.acceptDeleting}}" stepKey="submitDeleting"/>
+        <waitForPageLoad stepKey="waitForDeleting"/>
+        <see userInput="You deleted the RMA attribute." selector="{{AdminReturnAttributeSection.successMessage}}" stepKey="successMessage"/>
+        <click selector="{{AdminReturnAttributeSection.resetFilter}}" stepKey="resetFilter2"/>
+    </actionGroup>
+
+    <actionGroup name="VerifyDropdownReturnAttributeOnStorefront">
+        <arguments>
+            <argument name="attribute" defaultValue="DropdownReturnAttribute"/>
+            <argument name="orderId" type="string"/>
+            <argument name="customer"/>
+        </arguments>
+        <see userInput="{{orderId}}" selector="{{StorefrontCustomerReturnSection.orderId}}" stepKey="seeOrderId"/>
+        <see userInput="{{customer.email}}" selector="{{StorefrontCustomerReturnSection.email}}" stepKey="seeCustomerEmail"/>
+        <see userInput="{{attribute.option_name}}" selector="{{StorefrontCustomerReturnSection.customAttributeSelect('0',attribute.label)}}" stepKey="seeCustomAttribute"/>
+    </actionGroup>
+</actionGroups>

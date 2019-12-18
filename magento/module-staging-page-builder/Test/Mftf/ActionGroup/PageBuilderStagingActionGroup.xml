@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="PageBuilderOpenContentSectionOnStagingSlideOut" extends="OpenContentSectionOnStagingSlideOut">
+        <waitForElementNotVisible selector="{{PageBuilderStage.stageLoading}}" after="waitForStageToLoad" stepKey="waitForStageNotLoading"/>
+        <waitForElementVisible time="30" selector="{{RowOnStage.base('1')}}" after="waitForStageNotLoading" stepKey="waitForPageBuilderRow"/>
+    </actionGroup>
+    <actionGroup name="openPreviewForScheduledUpdateFromSlideOut" extends="openPreviewForScheduledUpdate">
+        <!-- This goes in EE repo -->
+        <arguments>
+            <argument name="index" defaultValue="1" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{AdminStagingSlideOutSection.previewModal}}" stepKey="clickPreviewScheduleUpdate"/>
+        <click selector="{{AdminStagingSlideOutSection.previewModal}}" stepKey="switchToNextTab"/>
+    </actionGroup>
+    <actionGroup name="saveScheduleUpdate">
+        <!-- This goes in EE repo -->
+        <arguments>
+            <argument name="stagingUpdate" defaultValue="_defaultStaging"/>
+            <argument name="index" defaultValue="2" type="string"/>
+        </arguments>
+        <waitForElementVisible selector="{{AdminStagingSlideOutSection.saveButton(index)}}" stepKey="waitForSaveButton"/>
+        <click selector="{{AdminStagingSlideOutSection.saveButton(index)}}" stepKey="clickSave"/>
+        <waitForPageLoad stepKey="waitForSave"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(stagingUpdate.name)}}" userInput="{{stagingUpdate.name}}" stepKey="seeUpdateName"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(stagingUpdate.description)}}" userInput="{{stagingUpdate.description}}" stepKey="seeDescription"/>
+    </actionGroup>
+</actionGroups>

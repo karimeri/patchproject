@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminSettingCustomerPhoneNumberTest">
+        <annotations>
+            <features value="CustomAttributeManagement"/>
+            <stories value="MAGETWO-91659: Cannot set Phone Number not required"/>
+            <title value="Settings of customer phone number field (phone number is optional)."/>
+            <description value="When Phone Number field is optional, new customer should be created without phone number"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MAGETWO-94822"/>
+            <group value="Customer"/>
+        </annotations>
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <!--Set Show Telephone to Optional-->
+            <createData entity="ConfigShowTelephoneOptional" stepKey="setConfigShowTelephoneOptional"/>
+        </before>
+        <after>
+            <!--Set Show Telephone to Required (default)-->
+            <createData entity="DefaultConfigShowTelephoneRequired" stepKey="setDefaultConfigShowTelephone"/>
+            <!--Delete created customer-->
+            <magentoCLI stepKey="reindex" command="indexer:reindex"/>
+            <reloadPage stepKey="reloadPage"/>
+            <actionGroup ref="DeleteCustomerFromAdminActionGroup" stepKey="DeleteCustomer">
+                <argument name="customer" value="Simple_US_Customer"/>
+            </actionGroup>
+            <!--Log Out-->
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <!--Create New Customer-->
+        <amOnPage url="{{AdminNewCustomerPage.url}}" stepKey="navigateToNewCustomerPage"/>
+        <waitForPageLoad stepKey="waitForNewCustomerPageOpen"/>
+        <!--Fill in required fields-->
+        <fillField stepKey="FillFirstName" selector="{{AdminCustomerAccountInformationSection.firstName}}" userInput="{{Simple_US_Customer.firstname}}"/>
+        <fillField stepKey="FillLastName" selector="{{AdminCustomerAccountInformationSection.lastName}}" userInput="{{Simple_US_Customer.lastname}}"/>
+        <fillField stepKey="FillEmail" selector="{{AdminCustomerAccountInformationSection.email}}" userInput="{{Simple_US_Customer.email}}"/>
+        <scrollToTopOfPage stepKey="scrollToTopOfThePage"/>
+        <click stepKey="saveCustomer" selector="{{AdminCustomerAccountInformationSection.saveCustomerAndContinueEdit}}"/>
+        <waitForPageLoad stepKey="waitForCustomersPage"/>
+        <see stepKey="seeSuccessMessage" userInput="You saved the customer."/>
+        <!--Go to Addresses > Add New Addresses-->
+        <scrollToTopOfPage stepKey="scrollToAddresses"/>
+        <click stepKey="goToAddresses" selector="{{AdminCustomerAccountInformationSection.addressesButton}}"/>
+        <waitForAjaxLoad stepKey="waitForAddresses" time="5"/>
+        <click stepKey="clickOnAddNewAddress" selector="{{AdminCustomerAddressesSection.addNewAddress}}"/>
+        <waitForPageLoad stepKey="waitForAddressFields"/>
+        <fillField stepKey="fillStreetAddress" selector="{{AdminCustomerAddressesSection.streetAddress}}" userInput="{{NewCustomerData.StreetAddress}}"/>
+        <fillField stepKey="fillCity" selector="{{AdminCustomerAddressesSection.city}}" userInput="{{NewCustomerData.City}}"/>
+        <click stepKey="openCountry" selector="{{AdminCustomerAddressesSection.country}}"/>
+        <selectOption stepKey="selectCountry" selector="{{AdminCustomerAddressesSection.country}}" userInput="{{NewCustomerData.country}}"/>
+        <fillField stepKey="fillZip" selector="{{AdminCustomerAddressesSection.zip}}" userInput="{{NewCustomerData.Zip}}"/>
+        <click stepKey="saveAddress" selector="{{AdminCustomerAddressesSection.saveAddress}}"/>
+        <waitForPageLoad stepKey="waitForAddressSave"/>
+        <!---Verify that New Customer is created without filing Phone Number field.-->
+        <seeElement selector="{{AdminCustomerAddressesSection.customerAddressRow(NewCustomerData.country)}}"  stepKey="seeNewAddressInGrid"/>
+    </test>
+</tests>

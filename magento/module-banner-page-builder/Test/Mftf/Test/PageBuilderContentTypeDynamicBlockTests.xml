@@ -1,0 +1,1376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="DynamicBlockValidateEmptyState">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic Block - Initial Status"/>
+            <description value="Verify that Dynamic Block preview is applied."/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-3819"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToAPageWithPageBuilder" stepKey="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <click selector="{{DynamicBlockOnForm.selectBlockBtn}}" stepKey="clickSelectBlockBtn"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.searchBox}}" stepKey="waitForBlockGrid"/>
+        <seeElement selector="{{DynamicBlockOnGrid.emptyGrid}}" stepKey="searchBlockInGrid"/>
+        <grabTextFrom selector="{{DynamicBlockOnGrid.emptyGrid}}" stepKey="grabNameFromEmptyGrid"/>
+        <assertEquals stepKey="assertEmptyGridText" message="Empty grid says we could not find any records">
+            <expectedResult type="string">We couldn't find any records.</expectedResult>
+            <actualResult type="variable">$grabNameFromEmptyGrid</actualResult>
+        </assertEquals>
+        <click selector="{{DynamicBlockOnGrid.cancelButton}}" stepKey="closeSlideOut"/>
+        <actionGroup ref="closeEditPanelSettings" stepKey="closeSlideEditPanel"/>
+        <waitForElementVisible selector="{{DynamicBlockOnStage.status('1', 'Empty Dynamic Block')}}" stepKey="seeEmptyDynamicBlockPlaceHolder"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <comment userInput="Validate Storefront" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToCMSPageStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <waitForElement selector="{{DynamicBlockOnStorefront.empty('1')}}" stepKey="waitForSeeElement"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStorefront.empty('1')}}" stepKey="seeBlockContentOnCmsStage"/>
+    </test>
+    <test name="DynamicBlockAddToCmsPage">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Add Dynamic Block to CMS Page"/>
+            <description value="Verify that admin are able to add a dynamic block instance to Dynamic Block Content Type and see it on frontend"/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-3825"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData stepKey="createSalesRule" entity="ApiSalesRule"/>
+            <createData entity="ApiSalesRuleCoupon" stepKey="createSalesRuleCoupon">
+                <requiredEntity createDataKey="createSalesRule"/>
+            </createData>
+            <createData entity="customerSegmentForGuests" stepKey="createPreReqCustomerSegment"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedDynamicBlockEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <click selector="{{SelectCustomerSegmentSection.CustomerSegmentDropdown}}" stepKey="openCustomerSegmentList"/>
+        <waitForElementVisible selector="{{SelectCustomerSegmentSection.CustomerSegmentOption($$createPreReqCustomerSegment.name$$)}}" stepKey="waitForOptions"/>
+        <click selector="{{SelectCustomerSegmentSection.CustomerSegmentOption($$createPreReqCustomerSegment.name$$)}}" stepKey="selectCustomerSegmentOption"/>
+        <click selector="{{SelectCustomerSegmentSection.DoneBtn}}" stepKey="clickDoneBtn"/>
+        <!-- Go to Assign Cart Rule To Dynamic Block -->
+        <actionGroup ref="AssignRelatedCartPriceRuleToBannerActionGroup" stepKey="assignCartPriceRuleToBanner">
+            <argument name="Banner" value="sampleBanner"/>
+            <argument name="CartPriceRule" value="$$createSalesRule$$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForPageLoad4"/>
+        <see userInput="You saved the dynamic block." stepKey="seeSuccessMessage"/>
+        <!-- Go to created CMS page and choose Dynamic Block -->
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{BlockOnForm.title('$$createDynamicBlock.name$$')}}" stepKey="waitToSeeBlockTitle"/>
+        <seeElement selector="{{DynamicBlockOnForm.blockInfo('Enabled')}}" stepKey="seeDynamicBlockEnabled"/>
+        <seeElement selector="{{DynamicBlockOnForm.blockInfo($$createSalesRule.name$$)}}" stepKey="seeCartPriceRuleName"/>
+        <seeElement selector="{{DynamicBlockOnForm.blockInfo($$createPreReqCustomerSegment.name$$)}}" stepKey="seeCustomerSegmentName"/>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection"/>
+        <!-- Update Values -->
+        <comment userInput="Update Values" stepKey="commentUpdateValues"/>
+        <actionGroup ref="chooseVisualSelectOption" stepKey="enterAlignment">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+        </actionGroup>
+        <actionGroup ref="selectSlideOutPanelField" stepKey="enterBorder">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyDouble"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderColor">
+            <argument name="property" value="PageBuilderAdvancedBorderColorProperty_green"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderWidth">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthProperty10"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderRadius">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterCssClasses">
+            <argument name="property" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldMargins" stepKey="enterMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldPadding" stepKey="enterPadding">
+            <argument name="property" value="PageBuilderPaddingPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings"/>
+        <!-- Validate Stage -->
+        <comment userInput="Validate Stage" stepKey="commentValidateStage"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStage">
+            <argument name="page" value="DynamicBlockOnStage"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        <!-- Validate Stage After Save -->
+        <comment userInput="Validate Stage After Save" stepKey="commentValidateStage3"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStage2">
+            <argument name="page" value="DynamicBlockOnStage"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStage4">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection3"/>
+        <!-- Validate Edit Panel After Save -->
+        <comment userInput="Validate Edit Panel After Save" stepKey="commentValidateEditPanel2"/>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateAlignment2">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+        </actionGroup>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateBorder2">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyDouble"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderColor2">
+            <argument name="property" value="PageBuilderAdvancedBorderColorProperty_green"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderWidth2">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthProperty10"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderRadius2">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateCssClasses2">
+            <argument name="property" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+        </actionGroup>
+        <actionGroup ref="seeInMarginFieldsSlideOutPanel" stepKey="validateMargins2">
+            <argument name="property" value="PageBuilderMarginsPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="seeInPaddingFieldsSlideOutPanel" stepKey="validatePadding2">
+            <argument name="property" value="PageBuilderPaddingPropertyUnique"/>
+        </actionGroup>
+        <!-- Validate Storefront -->
+        <comment userInput="Validate Storefront" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToCMSPageStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="waitForContentTypeShownStorefront1"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStorefront">
+            <argument name="page" value="DynamicBlockOnStorefront"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+    </test>
+    <test name="DynamicBlockDeleteFromPageBuilderStage">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic Block - Delete from Stage"/>
+            <description value="Verify that Dynamic Block is no longer visible on stage or storefront after being deleted from PageBuilder stage."/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-3822"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveAndCloseSlideEditPanel"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('1', $$createDynamicBlock.name$$)}}" stepKey="seeCreatedDynamicBlockTitleOnStage"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        <comment userInput="Remove Dynamic Block from Stage" stepKey="commentRemoveDynamicBlockFromStage"/>
+        <actionGroup ref="removeContentTypeFromStage" stepKey="removeDynamicBlockFromStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <dontSeeElementInDOM selector="{{PageBuilderStage.contentTypeInStageByIndex(PageBuilderDynamicBlockContentType.role, '1')}}" stepKey="dontSeeDynamicBlockInStage"/>
+        <actionGroup ref="saveCmsPage" stepKey="saveCmsPage"/>
+        <comment userInput="Validate Storefront" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToCMSPageStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <dontSeeElementInDOM selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="dontSeeDynamicBlockInStorefront"/>
+    </test>
+    <test name="DynamicBlockDragAndMove">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic Block - Drag and Move"/>
+            <description value="Verify that dynamic block is dragged and moved to another part of stage properly"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-3824"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveAndCloseSlideEditPanel"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('1', $$createDynamicBlock.name$$)}}" stepKey="seeCreatedDynamicBlockTitleOnStage"/>
+        <comment userInput="Add Column to Stage" stepKey="commentAddColumnToStage"/>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragColumnIntoStage">
+            <argument name="contentType" value="PageBuilderColumnContentType"/>
+        </actionGroup>
+        <comment userInput="Drag and Move Dynamic Block on Stage to Column" stepKey="commentDragAndMoveDynamicBlockOnStageToColumn"/>
+        <actionGroup ref="dragContentTypeToContainer" stepKey="dragDynamicBlockToColumn">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+            <argument name="contentTypeIndex" value="1"/>
+            <argument name="containerTargetType" value="PageBuilderColumnContentType"/>
+            <argument name="containerTargetIndex" value="2"/>
+        </actionGroup>
+        <actionGroup ref="validateContentTypeInsideContainerStage" stepKey="validateDynamicBlockInsideColumn">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+            <argument name="containerTargetType" value="PageBuilderColumnContentType"/>
+            <argument name="contentTypeIndex" value="1"/>
+            <argument name="containerTargetIndex" value="2"/>
+        </actionGroup>
+    </test>
+    <test name="DynamicBlockEntityIsDeletedStatusOnStage">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic Block - Entity Deletion Placeholder Message on Stage"/>
+            <description value="Verify that dynamic block entity deleted after being inserted into stage shows deleted status message"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-3829"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveAndCloseSlideEditPanel"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('1', $$createDynamicBlock.name$$)}}" stepKey="seeCreatedDynamicBlockTitleOnStage"/>
+        <actionGroup ref="saveCmsPage" stepKey="saveCmsPage"/>
+        <comment userInput="Delete Dynamic Block" stepKey="commentDeleteDynamicBlock"/>
+        <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+            <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+        </actionGroup>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage2">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnStage.deleted('1')}}" stepKey="seeDeletedDynamicBlockPlaceHolder"/>
+    </test>
+    <test name="DynamicBlockEntityIsDeletedAndMissingInGrid">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic Block - Entity Deletion non-existent in grid"/>
+            <description value="Verify that deleted dynamic block entity does not appear in grid"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-16680"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <click selector="{{DynamicBlockOnForm.selectBlockBtn}}" stepKey="clickSelectBlockBtn"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.searchBox}}" stepKey="waitForBlockGrid"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.selectBtn($$createDynamicBlock.name$$)}}" stepKey="waitForSelectBlockOnGridBtn"/>
+        <comment userInput="Delete Dynamic Block" stepKey="commentDeleteDynamicBlock"/>
+        <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+            <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+        </actionGroup>
+        <comment userInput="Do not see Dynamic Block on grid" stepKey="commentDoNotSeeDynamicBlockOnGrid"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage2">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent2">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage2">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop2">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <click selector="{{DynamicBlockOnForm.selectBlockBtn}}" stepKey="clickSelectBlockBtn2"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.searchBox}}" stepKey="waitForBlockGrid2"/>
+        <dontSeeElementInDOM selector="{{DynamicBlockOnGrid.selectBtn($$createDynamicBlock.name$$)}}" stepKey="doNotSeeDeletedDynamicBlockGridRowInDOM"/>
+    </test>
+    <test name="DynamicBlockGetDisabledFromDynamicBlockEntity">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic Block - Entity Disabling"/>
+            <description value="Verify that disabled dynamic block entity appears disabled in grid and in form, and has disabled placeholder message on stage"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-3828"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveAndCloseSlideEditPanel"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('1', $$createDynamicBlock.name$$)}}" stepKey="seeCreatedDynamicBlockTitleOnStage"/>
+        <actionGroup ref="saveCmsPage" stepKey="saveCmsPage"/>
+        <comment userInput="Disable Dynamic Block" stepKey="commentDisableDynamicBlock"/>
+        <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedDynamicBlockEditPage">
+            <argument name="Banner" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <click selector="{{AdminBannerBasicActionSection.EnableBanner}}" stepKey="disableDynamicBlock"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveDynamicBlock"/>
+        <comment userInput="See Dynamic Block disabled on stage" stepKey="commentSeeDynamicBlockDisabledOnStage"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage2">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent2">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnStage.status('1', 'Dynamic Block disabled')}}" stepKey="seeDisabledDynamicBlockPlaceholder"/>
+        <comment userInput="See Dynamic Block disabled on form" stepKey="commentSeeDynamicBlockDisabledOnForm"/>
+        <actionGroup ref="openPageBuilderEditPanelByIndex" stepKey="openEditPanel">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnForm.blockTitle('$$createDynamicBlock.name$$')}}" stepKey="seeSelectedDynamicBlockTitleOnFormInSlideout"/>
+        <waitForElementVisible selector="{{DynamicBlockOnForm.status('Disabled')}}" stepKey="waitForDisabledStatusInDynamicBlockForm"/>
+        <comment userInput="See Dynamic Block disabled in grid" stepKey="commentSeeDynamicBlockDisabledInGrid"/>
+        <click selector="{{DynamicBlockOnForm.selectBlockBtn}}" stepKey="clickSelectBlockBtn2"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.searchBox}}" stepKey="waitForBlockGrid2"/>
+        <seeElement selector="{{DynamicBlockOnGrid.status($$createDynamicBlock.name$$, 'Disabled')}}" stepKey="waitForDisabledStatusInDynamicBlockGrid"/>
+    </test>
+    <test name="DynamicBlockDuplicate">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Duplicate Dynamic Block"/>
+            <description value="Verify that dynamic block can be duplicated on the stage"/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-3823"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <!-- Fill All Fields -->
+        <comment userInput="Fill All Fields" stepKey="commentEdit"/>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection"/>
+        <actionGroup ref="chooseVisualSelectOption" stepKey="enterAlignment">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+        </actionGroup>
+        <actionGroup ref="selectSlideOutPanelField" stepKey="enterBorder">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyDouble"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderColor">
+            <argument name="property" value="PageBuilderAdvancedBorderColorProperty_green"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderWidth">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthProperty10"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderRadius">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterCssClasses">
+            <argument name="property" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldMargins" stepKey="enterMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldPadding" stepKey="enterPadding">
+            <argument name="property" value="PageBuilderPaddingPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('1', $$createDynamicBlock.name$$)}}" stepKey="seeCreatedDynamicBlockTitleOnStage"/>
+        <!-- Duplicate and Validate Stage -->
+        <comment userInput="Duplicate" stepKey="commentDuplicate"/>
+        <actionGroup ref="duplicateContentType" stepKey="duplicateContentType">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('1', $$createDynamicBlock.name$$)}}" stepKey="seeInitialDynamicBlockTitleOnStage"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('2', $$createDynamicBlock.name$$)}}" stepKey="seeDuplicatedDynamicBlockTitleOnStage"/>
+        <comment userInput="Validate Stage" stepKey="commentValidateStage"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStage">
+            <argument name="page" value="DynamicBlockOnStage"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="2"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanelByIndex" stepKey="openEditMenuOnStage2">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+            <argument name="contentTypeIndex" value="2"/>
+        </actionGroup>
+        <!-- Validate Edit Panel For Duplicate -->
+        <comment userInput="Validate Edit Panel For Duplicate" stepKey="commentValidateEdit"/>
+        <!--add validation for block name-->
+        <waitForElementVisible selector="{{DynamicBlockOnForm.blockTitle($$createDynamicBlock.name$$)}}" stepKey="seeSelectedBlock"/>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandAdvancedSection2"/>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateAlignment">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+        </actionGroup>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateBorder">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyDouble"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderColor">
+            <argument name="property" value="PageBuilderAdvancedBorderColorProperty_green"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderWidth">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthProperty10"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderRadius">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateCssClasses">
+            <argument name="property" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+        </actionGroup>
+        <actionGroup ref="seeInMarginFieldsSlideOutPanel" stepKey="validateMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="seeInPaddingFieldsSlideOutPanel" stepKey="validatePadding">
+            <argument name="property" value="PageBuilderPaddingPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="closeEditPanelSettings" stepKey="closeEditPanel"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        <!-- Validate Stage After Save -->
+        <comment userInput="Validate Stage After Save" stepKey="commentValidateStage2"/>
+        <!-- Validate content type is enabled after save -->
+        <seeElementInDOM selector="{{DynamicBlockOnStage.title('2', $$createDynamicBlock.name$$)}}" stepKey="seeDuplicatedDynamicBlockTitleOnStage2"/>
+        <actionGroup ref="openPageBuilderEditPanelByIndex" stepKey="openEditMenuOnStage3">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+            <argument name="contentTypeIndex" value="2"/>
+        </actionGroup>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandAdvancedSection3"/>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateAlignment2">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+        </actionGroup>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateBorder2">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyDouble"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderColor2">
+            <argument name="property" value="PageBuilderAdvancedBorderColorProperty_green"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderWidth2">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthProperty10"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderRadius2">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateCssClasses2">
+            <argument name="property" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+        </actionGroup>
+        <actionGroup ref="seeInMarginFieldsSlideOutPanel" stepKey="validateMargins2">
+            <argument name="property" value="PageBuilderMarginsPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="seeInPaddingFieldsSlideOutPanel" stepKey="validatePadding2">
+            <argument name="property" value="PageBuilderPaddingPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToCMSPageStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="waitForContentTypeShownStorefront1"/>
+        <waitForElementVisible selector="{{DynamicBlockOnStorefront.base('2')}}" stepKey="waitForContentTypeShownStorefront2"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStorefront2">
+            <argument name="page" value="DynamicBlockOnStorefront"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="2"/>
+        </actionGroup>
+    </test>
+    <test name="DynamicBlockValidateAdvancedConfigurationDefaultValues">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Validate Advanced Configuration Default Values"/>
+            <description value="Validate Advanced Configuration Default Values"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-3820"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <!-- Validate Default Values -->
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection"/>
+        <comment userInput="Validate Default Values" stepKey="CommentValidateDefaultValues"/>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateAlignment">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateBorder">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyNone"/>
+        </actionGroup>
+        <grabValueFrom selector="{{EditPanelForm.panelFieldControl(PageBuilderAdvancedBorderColorDefaultProperty.section, PageBuilderAdvancedBorderColorDefaultProperty.fieldName)}}" stepKey="getBorderColor"/>
+        <assertEmpty actual="getBorderColor" actualType="variable" message="Text field has text: $getBorderColor" stepKey="assertBorderColor"/>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderWidth">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderRadius">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusDefaultProperty"/>
+        </actionGroup>
+        <grabValueFrom selector="{{EditPanelForm.panelFieldControl(PageBuilderAdvancedCssClassesDefaultProperty.section, PageBuilderAdvancedCssClassesDefaultProperty.fieldName)}}" stepKey="getCssClasses"/>
+        <assertEmpty actual="getCssClasses" actualType="variable" message="Text field was not empty. Had text: $getCssClasses" stepKey="assertCssClasses"/>
+        <actionGroup ref="seeInMarginFieldsSlideOutPanel" stepKey="validateMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="seeInPaddingFieldsSlideOutPanel" stepKey="validatePadding">
+            <argument name="property" value="PageBuilderPaddingPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings"/>
+        <!-- Validate Stage -->
+        <comment userInput="Validate Stage" stepKey="commentValidateStage"/>
+        <actionGroup ref="validateAdvancedStyleWithNoAlignment" stepKey="validateStage">
+            <argument name="page" value="DynamicBlockOnStage"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyNone"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthPropertyDefault"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusDefaultProperty"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyDefault"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyDefault"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        <!-- Validate Stage After Save -->
+        <comment userInput="Validate Stage After Save" stepKey="commentValidateStage2"/>
+        <actionGroup ref="validateAdvancedStyleWithNoAlignment" stepKey="validateStage2">
+            <argument name="page" value="DynamicBlockOnStage"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyNone"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthPropertyDefault"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusDefaultProperty"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyDefault"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyDefault"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStage2">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection2"/>
+        <!-- Validate Edit Panel After Save -->
+        <comment userInput="Validate Edit Panel After Save" stepKey="commentValidateEditPanel2"/>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateAlignment2">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateBorder2">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyNone"/>
+        </actionGroup>
+        <grabValueFrom selector="{{EditPanelForm.panelFieldControl(PageBuilderAdvancedBorderColorDefaultProperty.section, PageBuilderAdvancedBorderColorDefaultProperty.fieldName)}}" stepKey="getBorderColor2"/>
+        <assertEmpty actual="getBorderColor2" actualType="variable" message="Text field has text: $getBorderColor2" stepKey="assertBorderColor2"/>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderWidth2">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderRadius2">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusDefaultProperty"/>
+        </actionGroup>
+        <grabValueFrom selector="{{EditPanelForm.panelFieldControl(PageBuilderAdvancedCssClassesDefaultProperty.section, PageBuilderAdvancedCssClassesDefaultProperty.fieldName)}}" stepKey="getCssClasses2"/>
+        <assertEmpty actual="getCssClasses2" actualType="variable" message="Text field was not empty. Had text: $getCssClasses2" stepKey="assertCssClasses2"/>
+        <actionGroup ref="seeInMarginFieldsSlideOutPanel" stepKey="validateMargins2">
+            <argument name="property" value="PageBuilderMarginsPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="seeInPaddingFieldsSlideOutPanel" stepKey="validatePadding2">
+            <argument name="property" value="PageBuilderPaddingPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToCMSPageStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="waitForContentTypeShownStorefront1"/>
+        <!-- Validate Storefront -->
+        <comment userInput="Validate Storefront" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="validateAdvancedStyleWithNoAlignment" stepKey="validateStorefront">
+            <argument name="page" value="DynamicBlockOnStorefront"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyNone"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthPropertyDefault"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusDefaultProperty"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyDefault"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyDefault"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+    </test>
+    <test name="DynamicBlockUpdateAdvancedConfigurationValues">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Update Default Values of  Dynamic Block"/>
+            <description value="Validate that updating every attribute in the Advanced Configuration form for Dynamic Block will update the Stage and Storefront correctly"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-3821"/>
+            <useCaseId value="MC-1413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection"/>
+        <!-- Update Values -->
+        <comment userInput="Update Values" stepKey="commentUpdateValues"/>
+        <actionGroup ref="chooseVisualSelectOption" stepKey="enterAlignment">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+        </actionGroup>
+        <actionGroup ref="selectSlideOutPanelField" stepKey="enterBorder">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyDouble"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderColor">
+            <argument name="property" value="PageBuilderAdvancedBorderColorProperty_green"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderWidth">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthProperty10"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterBorderRadius">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterCssClasses">
+            <argument name="property" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldMargins" stepKey="enterMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldPadding" stepKey="enterPadding">
+            <argument name="property" value="PageBuilderPaddingPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings"/>
+        <!-- Validate Stage -->
+        <comment userInput="Validate Stage" stepKey="commentValidateStage"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStage">
+            <argument name="page" value="DynamicBlockOnStage"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        <!-- Validate Stage After Save -->
+        <comment userInput="Validate Stage After Save" stepKey="commentValidateStage3"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStage2">
+            <argument name="page" value="DynamicBlockOnStage"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStage4">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection3"/>
+        <!-- Validate Edit Panel After Save -->
+        <comment userInput="Validate Edit Panel After Save" stepKey="commentValidateEditPanel2"/>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateAlignment2">
+            <argument name="property" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+        </actionGroup>
+        <actionGroup ref="seeOptionIsSelectedSlideOutProperty" stepKey="validateBorder2">
+            <argument name="property" value="PageBuilderAdvancedBorderPropertyDouble"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderColor2">
+            <argument name="property" value="PageBuilderAdvancedBorderColorProperty_green"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderWidth2">
+            <argument name="property" value="PageBuilderAdvancedBorderWidthProperty10"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateBorderRadius2">
+            <argument name="property" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+        </actionGroup>
+        <actionGroup ref="seeInFieldSlideOutProperty" stepKey="validateCssClasses2">
+            <argument name="property" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+        </actionGroup>
+        <actionGroup ref="seeInMarginFieldsSlideOutPanel" stepKey="validateMargins2">
+            <argument name="property" value="PageBuilderMarginsPropertyUnique"/>
+        </actionGroup>
+        <actionGroup ref="seeInPaddingFieldsSlideOutPanel" stepKey="validatePadding2">
+            <argument name="property" value="PageBuilderPaddingPropertyUnique"/>
+        </actionGroup>
+        <!-- Validate Storefront -->
+        <comment userInput="Validate Storefront" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToCMSPageStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="waitForContentTypeShownStorefront1"/>
+        <actionGroup ref="validateAdvancedStyleWithAllUpdated" stepKey="validateAllAdvancedStorefront">
+            <argument name="page" value="DynamicBlockOnStorefront"/>
+            <argument name="alignment" value="PageBuilderAdvancedAlignmentPropertyCenter"/>
+            <argument name="border" value="PageBuilderAdvancedBorderPropertyDouble"/>
+            <argument name="borderColor" value="PageBuilderAdvancedBorderColorProperty_green"/>
+            <argument name="borderWidth" value="PageBuilderAdvancedBorderWidthProperty10"/>
+            <argument name="borderRadius" value="PageBuilderAdvancedBorderRadiusProperty12"/>
+            <argument name="cssClasses" value="PageBuilderAdvancedCssClassesPropertyThreeClasses"/>
+            <argument name="margin" value="PageBuilderMarginsPropertyUnique"/>
+            <argument name="padding" value="PageBuilderPaddingPropertyUnique"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+    </test>
+    <test name="DynamicBlockValidateShowHideDefaultState">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic block is shown by default"/>
+            <description value="Dynamic block is shown by default in stage and storefront"/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-4959"/>
+            <testCaseId value="MC-5781"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-hideShow"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToAPageWithPageBuilder" stepKey="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="addPageBuilderPageTitle" stepKey="enterPageTitle">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <!-- Add Dynamic Block to Stage -->
+        <comment userInput="Add Dynamic Block to Stage" stepKey="addDynamicBlockToStage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragDynamicBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnForm.blockTitle('$$createDynamicBlock.name$$')}}" stepKey="waitForDynamicBlockElementVisible"/>
+        <seeElement selector="{{DynamicBlockOnForm.blockTitle('$$createDynamicBlock.name$$')}}" stepKey="seeDynamicBlockTitleOnForm"/>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings"/>
+        <!-- Stage: Validate Default Show/Hide State - Before Save -->
+        <comment userInput="Stage: Validate Default Show/Hide State Before Save" stepKey="CommentValidateDefaultShowHideStateOnStageBeforeSave"/>
+        <seeElement selector="{{DynamicBlockOnStage.notHidden('1')}}" stepKey="seeContentTypeNotHiddenStageBeforeSave"/>
+        <!-- Stage: Validate Default Show/Hide State - After Save -->
+        <comment userInput="Stage: Validate Default Show/Hide State - After Save" stepKey="CommentValidateDefaultShowHideStateOnStageAfterSave"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        <seeElement selector="{{DynamicBlockOnStage.notHidden('1')}}" stepKey="seeContentTypeNotHiddenStageAfterSave"/>
+        <!-- Storefront: Validate Default Show/Hide State -->
+        <comment userInput="Storefront: Validate Default Show/Hide State" stepKey="CommentValidateDefaultShowHideStateOnStorefront"/>
+        <actionGroup ref="navigateToStoreFront" stepKey="navigateToStoreFront">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <seeElement selector="{{DynamicBlockOnStorefront.notHidden('1')}}" stepKey="seeContentTypeNotHiddenStorefront"/>
+    </test>
+    <test name="DynamicBlockValidateShowHide">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic block has hide show capabilities"/>
+            <description value="A user is able to hide and show the Dynamic Block successfully"/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-4959"/>
+            <testCaseId value="MC-5782"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-hideShow"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToAPageWithPageBuilder" stepKey="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <closeTab stepKey="closeOpenedTab"/>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="addPageBuilderPageTitle" stepKey="enterPageTitle">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragDynamicBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnForm.blockTitle('$$createDynamicBlock.name$$')}}" stepKey="waitToSeeDynamicBlockTitle"/>
+        <seeElement selector="{{DynamicBlockOnForm.blockTitle('$$createDynamicBlock.name$$')}}" stepKey="seeDynamicBlockTitleOnForm"/>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings"/>
+        <actionGroup ref="hideContentType" stepKey="hideContentType">
+            <argument name="section" value="DynamicBlockOnStage"/>
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage1"/>
+        <!-- Validate content type remains disabled after save -->
+        <comment userInput="Validate content type remains disabled after save" stepKey="commentValidateHiddenStage"/>
+        <seeElement selector="{{DynamicBlockOnStage.hidden('1')}}" stepKey="waitForContentTypeHidden"/>
+        <!-- Validate store front -->
+        <comment userInput="Validate content type is disabled on storefront" stepKey="commentValidateHiddenStorefront"/>
+        <openNewTab stepKey="openNewTab"/>
+        <actionGroup ref="navigateToStoreFront" stepKey="navigateToStoreFront">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <waitForElement selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="waitForContentTypeNotVisible"/>
+        <dontSeeElement selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="dontSeeContentType"/>
+        <seeElementInDOM selector="{{DynamicBlockOnStorefront.hidden('1')}}" stepKey="waitForHiddenElement"/>
+        <!-- Set content to visible in admin -->
+        <comment userInput="Set content to visible in admin" stepKey="commentSetContentToVisibleAdmin"/>
+        <switchToNextTab stepKey="switchBackToAdmin"/>
+        <reloadPage stepKey="reloadPage"/>
+        <waitForPageLoad stepKey="waitForAdminReload"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage"/>
+        <actionGroup ref="showContentType" stepKey="showContentType">
+            <argument name="section" value="DynamicBlockOnStage"/>
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage1"/>
+        <!-- Validate Content Is Shown Storefront -->
+        <comment userInput="Validate Content Is Shown Storefront" stepKey="commentValidateContentIsShownStorefront"/>
+        <switchToNextTab stepKey="switchBackToStorefront"/>
+        <reloadPage stepKey="reloadStorefront"/>
+        <waitForPageLoad stepKey="waitForStorefrontReload"/>
+        <dontSeeElementInDOM selector="{{DynamicBlockOnStorefront.hidden('1')}}" stepKey="dontSeeHiddenElement"/>
+        <seeElement selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="waitForContentTypeVisible"/>
+    </test>
+    <test name="DynamicBlockValidateNoExtraPadding">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Validate No Extra Padding On Dynamic Block"/>
+            <description value="Verify that there are no extra padding on dynamic block"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-14908"/>
+            <useCaseId value="MC-5413"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedDynamicBlock">
+            <argument name="Banner" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <!-- Delete HTML Code -->
+        <comment userInput="Delete HTML Code" stepKey="commentDeleteHTMLCodeDynamicBlock"/>
+        <actionGroup ref="removeContentTypeFromStage" stepKey="removeHTMLFromDynamicBlock">
+            <argument name="contentType" value="PageBuilderHtmlContentType"/>
+            <argument name="offsetYCoordinate" value="10"/>
+        </actionGroup>
+        <!-- Set Dynamic Block Row Margins and Padding to 0 -->
+        <comment userInput="Set Dynamic Block Row Margins and Padding to 0" stepKey="commentSetDynamicBlockRowMarginsAndPaddingToZero"/>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openDynamicBlockRowEditMenu">
+            <argument name="contentType" value="PageBuilderRowContentType"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterMinimumHeightProperty">
+            <argument name="property" value="PageBuilderMinHeightProperty_300"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldMargins" stepKey="enterDynamicBlockRowMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldPadding" stepKey="enterDynamicBlockRowPadding">
+            <argument name="property" value="PageBuilderPaddingPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="saveDynamicBlockRowEditPanelSettings"/>
+        <actionGroup ref="saveDynamicBlock" stepKey="saveDynamicBlock"/>
+        <!-- Go to created CMS page and choose Dynamic Block -->
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <!-- Set Row Margins and Padding to 0 -->
+        <comment userInput="Set Row Margins and Padding to 0" stepKey="commentSetRowMarginsAndPaddingToZero"/>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openRowEditMenuOnStage">
+            <argument name="contentType" value="PageBuilderRowContentType"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldMargins" stepKey="enterRowMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldPadding" stepKey="enterRowPadding">
+            <argument name="property" value="PageBuilderPaddingPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveRowEditPanelSettings"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStageAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="expandConfigurationSection" stepKey="expandConfigurationSection"/>
+        <!-- Set Dynamic Block Margins and Padding to 0 -->
+        <comment userInput="Set Dynamic Block Margins and Padding to 0" stepKey="commentSetDynamicBlockMarginsAndPaddingToZero"/>
+        <actionGroup ref="fillSlideOutPanelFieldMargins" stepKey="enterDynamicBlockMargins">
+            <argument name="property" value="PageBuilderMarginsPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldPadding" stepKey="enterDynamicBlockPadding">
+            <argument name="property" value="PageBuilderPaddingPropertyDefault"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveDynamicBlockEditPanelSettings"/>
+        <!-- Validate Stage -->
+        <comment userInput="Validate Stage" stepKey="commentValidateStage"/>
+        <!-- Validate Position Of Top Of Row Is The Same As Top Of Dynamic Block -->
+        <comment userInput="Validate Position Of Top Of Row Is The Same As Top Of Dynamic Block" stepKey="commentValidateTopPositionIsSameStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().top" stepKey="getTopPositionOfDynamicBlockStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStage.base('1')}}`, document.body).iterateNext().getBoundingClientRect().top" stepKey="getTopPositionOfRowStage"/>
+        <assertEquals stepKey="checkTopPositionIsSameStage">
+            <expectedResult type="variable">getTopPositionOfDynamicBlockStage</expectedResult>
+            <actualResult type="variable">getTopPositionOfRowStage</actualResult>
+        </assertEquals>
+        <!-- Validate Position Of Bottom Of Row Is The Same As Bottom Of Dynamic Block -->
+        <comment userInput="Validate Position Of Bottom Of Row Is The Same As Bottom Of Dynamic Block" stepKey="commentValidateBottomPositionIsSameStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().bottom" stepKey="getBottomPositionOfDynamicBlockStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStage.base('1')}}`, document.body).iterateNext().getBoundingClientRect().bottom" stepKey="getBottomPositionOfRowStage"/>
+        <assertEquals stepKey="checkBottomPositionIsSameStage">
+            <expectedResult type="variable">getBottomPositionOfDynamicBlockStage</expectedResult>
+            <actualResult type="variable">getBottomPositionOfRowStage</actualResult>
+        </assertEquals>
+        <!-- Validate Position Of Left Of Row Is The Same As Left Of Dynamic Block -->
+        <comment userInput="Validate Position Of Left Of Row Is The Same As Left Of Dynamic Block" stepKey="commentValidateLeftPositionIsSameStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().left" stepKey="getLeftPositionOfDynamicBlockStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStage.base('1')}}`, document.body).iterateNext().getBoundingClientRect().left" stepKey="getLeftPositionOfRowStage"/>
+        <assertEquals stepKey="checkLeftPositionIsSameStage">
+            <expectedResult type="variable">getLeftPositionOfDynamicBlockStage</expectedResult>
+            <actualResult type="variable">getLeftPositionOfRowStage</actualResult>
+        </assertEquals>
+        <!-- Validate Position Of Right Of Row Is The Same As Right Of Dynamic Block -->
+        <comment userInput="Validate Position Of Right Of Row Is The Same As Right Of Dynamic Block" stepKey="commentValidateRightPositionIsSameStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().right" stepKey="getRightPositionOfDynamicBlockStage"/>
+        <executeJS function="return document.evaluate(`{{RowOnStage.base('1')}}`, document.body).iterateNext().getBoundingClientRect().right" stepKey="getRightPositionOfRowStage"/>
+        <assertEquals stepKey="checkRightPositionIsSameStage">
+            <expectedResult type="variable">getRightPositionOfDynamicBlockStage</expectedResult>
+            <actualResult type="variable">getRightPositionOfRowStage</actualResult>
+        </assertEquals>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage1"/>
+        <!-- Validate Storefront -->
+        <comment userInput="Validate Storefront" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToStoreFront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <waitForElementVisible selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="waitForContentTypeShownStorefront1"/>
+        <!-- Validate Position Of Top Of Row Is The Same As Top Of Dynamic Block -->
+        <comment userInput="Validate Position Of Top Of Row Is The Same As Top Of Dynamic Block" stepKey="commentValidateTopPositionIsSame"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('2')}}`, document.body).iterateNext().getBoundingClientRect().top" stepKey="getTopPositionOfDynamicBlock"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().top" stepKey="getTopPositionOfRow"/>
+        <assertEquals stepKey="checkTopPositionIsSame">
+            <expectedResult type="variable">getTopPositionOfDynamicBlock</expectedResult>
+            <actualResult type="variable">getTopPositionOfRow</actualResult>
+        </assertEquals>
+        <!-- Validate Position Of Bottom Of Row Is The Same As Bottom Of Dynamic Block -->
+        <comment userInput="Validate Position Of Bottom Of Row Is The Same As Bottom Of Dynamic Block" stepKey="commentValidateBottomPositionIsSame"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('2')}}`, document.body).iterateNext().getBoundingClientRect().bottom" stepKey="getBottomPositionOfDynamicBlock"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().bottom" stepKey="getBottomPositionOfRow"/>
+        <assertEquals stepKey="checkBottomPositionIsSame">
+            <expectedResult type="variable">getBottomPositionOfDynamicBlock</expectedResult>
+            <actualResult type="variable">getBottomPositionOfRow</actualResult>
+        </assertEquals>
+        <!-- Validate Position Of Left Of Row Is The Same As Left Of Dynamic Block -->
+        <comment userInput="Validate Position Of Left Of Row Is The Same As Left Of Dynamic Block" stepKey="commentValidateLeftPositionIsSame"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('2')}}`, document.body).iterateNext().getBoundingClientRect().left" stepKey="getLeftPositionOfDynamicBlock"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().left" stepKey="getLeftPositionOfRow"/>
+        <assertEquals stepKey="checkLeftPositionIsSame">
+            <expectedResult type="variable">getLeftPositionOfDynamicBlock</expectedResult>
+            <actualResult type="variable">getLeftPositionOfRow</actualResult>
+        </assertEquals>
+        <!-- Validate Position Of Right Of Row Is The Same As Right Of Dynamic Block -->
+        <comment userInput="Validate Position Of Right Of Row Is The Same As Right Of Dynamic Block" stepKey="commentValidateRightPositionIsSame"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('2')}}`, document.body).iterateNext().getBoundingClientRect().right" stepKey="getRightPositionOfDynamicBlock"/>
+        <executeJS function="return document.evaluate(`{{RowOnStorefront.base('1')}}`, document.body).iterateNext().getBoundingClientRect().right" stepKey="getRightPositionOfRow"/>
+        <assertEquals stepKey="checkRightPositionIsSame">
+            <expectedResult type="variable">getRightPositionOfDynamicBlock</expectedResult>
+            <actualResult type="variable">getRightPositionOfRow</actualResult>
+        </assertEquals>
+    </test>
+    <test name="PageBuilderBlockRenderDynamicBlockThroughBlockContentType">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Block Content"/>
+            <title value="Render Dynamic Block Through Block Content Type"/>
+            <description value="Verify that users are able to successfully render and use the dynamic block content type through the Block content type."/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-14836"/>
+            <useCaseId value="MC-13769"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-block"/>
+            <group value="pagebuilder-block-content"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage"/>
+            <createData entity="_emptyCmsBlock" stepKey="createCMSBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedCMSBlockPage" stepKey="navigateToCreatedCMSBlockPage">
+                <argument name="CMSBlockPage" value="$$createCMSBlock$$"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSBlock" stepKey="deleteCMSBlock"/>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <!-- Add Dynamic Block -->
+        <comment userInput="Add Dynamic Block" stepKey="commentAddDynamicBlock"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandPageBuilderPanelMenuSection">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragDynamicBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <!-- Edit Dynamic Block -->
+        <comment userInput="Edit Dynamic Block" stepKey="commentEditDynamicBlock"/>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchDynamicBlockInGrid">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettingsDynamicBlock"/>
+        <actionGroup ref="saveCMSBlock" stepKey="saveCMSBlock"/>
+        <!-- Validate CMS Block Stage -->
+        <comment userInput="Validate CMS Block Stage" stepKey="commentValidateCMSBlockStage"/>
+        <seeElement selector="{{DynamicBlockOnStage.base('1')}}" stepKey="seeDynamicBlockCMSBlockStage"/>
+        <see selector="{{DynamicBlockOnStage.base('1')}}" userInput="$$createDynamicBlock.default_contents$$" stepKey="seeDynamicBlockContentOnCMSBlockStage"/>
+        <!-- Add Block to CMS Page -->
+        <comment userInput="Add Block to CMS Page" stepKey="commentAddBlockToCMSPage"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandPanelAddContentMenuSection">
+            <argument name="contentType" value="PageBuilderBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoPageStage">
+            <argument name="contentType" value="PageBuilderBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDropBlock">
+            <argument name="contentType" value="PageBuilderBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchBlockInGrid" stepKey="searchBlockInPageGrid">
+            <argument name="block" value="$$createCMSBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="savePageEditPanelSettingsBlock"/>
+        <!-- Validate CMS Page Stage -->
+        <comment userInput="Validate CMS Page Stage" stepKey="commentValidateCMSPageStage"/>
+        <seeElement selector="{{BlockOnStage.base('1')}}" stepKey="seeBlockCMSPageStage"/>
+        <seeElement selector="{{DynamicBlockOnStage.nestedPlaceholderText('1', $$createDynamicBlock.name$$)}}" stepKey="seeNestedDynamicBlockPlaceHolderNameCMSPageStage"/>
+        <seeElement selector="{{DynamicBlockOnStage.nestedPlaceholderSegments('1', $$createDynamicBlock.CustomerSegment$$)}}" stepKey="seeNestedDynamicBlockPlaceHolderSegmentsCMSPageStage"/>
+        <dontSeeElementInDOM selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="dontSeeDynamicBlockCMSPageStage"/>
+        <dontSee userInput="$$createDynamicBlock.default_contents$$" stepKey="dontSeeDynamicBlockContentCMSPageStage"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+        <!-- Validate CMS Page Storefront -->
+        <comment userInput="Validate CMS Page Storefront" stepKey="commentValidateCMSPageStorefront"/>
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToCMSPageStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <seeElement selector="{{BlockOnStorefront.base('1')}}" stepKey="seeBlockCMSPageStorefront"/>
+        <seeElement selector="{{DynamicBlockOnStorefront.base('1')}}" stepKey="seeDynamicBlockCMSPageStorefront"/>
+        <see selector="{{DynamicBlockOnStorefront.base('1')}}" userInput="$$createDynamicBlock.default_contents$$" stepKey="seeDynamicBlockContentCMSPageStorefront"/>
+    </test>
+</tests>

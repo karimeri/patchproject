@@ -1,0 +1,230 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+@border-size: 2px;
+
+.pagebuilder-header {
+    text-align: right;
+
+    > .icon-pagebuilder-fullscreen {
+        cursor: pointer;
+        display: inline-block;
+        padding: 15px 0 15px 15px;
+    }
+
+    > .icon-pagebuilder-fullscreen-exit:before {
+        padding-left: 0;
+    }
+}
+
+.admin__fieldset > .admin__field > .admin__control-grouped {
+    &.pagebuilder-active {
+        float: left;
+        margin: 3rem 0 0;
+        padding-left: 3rem;
+        width: 100%;
+    }
+}
+
+.pagebuilder-stage-wrapper {
+    -moz-transition: .35s ease-in-out;
+    -webkit-transition: .35s ease-in-out;
+    background: @color-white;
+    position: relative;
+    transition: .35s ease-in-out;
+
+    ._disabled & {
+        opacity: .5;
+        pointer-events: none;
+    }
+
+    &.stage-full-screen {
+        -moz-transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        background: @color-white;
+        height: 100%;
+        left: 0;
+        overflow: scroll;
+        overflow-x: hidden;
+        padding: 0;
+        position: fixed;
+        top: 0;
+        transform: translateZ(0);
+        width: 100%;
+        z-index: 800;
+
+        .pagebuilder-header {
+            float: right;
+            height: 0;
+            padding: 0;
+            position: fixed;
+            position: -webkit-sticky;
+            position: sticky;
+            right: 0;
+            top: 0;
+            width: auto;
+            z-index: 101;
+
+            .icon-pagebuilder-fullscreen-exit {
+                background: rgba(255,255,255,.8);
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                cursor: pointer;
+                display: inline-block;
+                margin: 0;
+                padding: 15px 20px;
+            }
+        }
+
+        .pagebuilder-canvas {
+            padding-top: 30px;
+        }
+
+        .pagebuilder-panel-wrapper {
+            bottom: 0;
+            position: fixed;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 102;
+
+            .pagebuilder-panel {
+                height: 100vh;
+                overflow-y: auto;
+
+                &::-webkit-scrollbar {
+                    width: 5px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background-color: darkgrey;
+                }
+
+                .pagebuilder-panel-menu-sections {
+                    padding-bottom: 41px;
+                }
+
+                .panel-controls {
+                    background-color: @color-very-dark-grayish-orange;
+                    bottom: 0;
+                    position: absolute;
+                    width: 100%;
+                }
+            }
+        }
+
+        .pagebuilder-stage {
+            margin-left: 150px;
+        }
+    }
+}
+
+.pagebuilder-wysiwyg-wrapper.pagebuilder-transition-out .pagebuilder-stage-wrapper {
+    .pagebuilder-stage-wrapper.stage-full-screen;
+
+    .pagebuilder-header {
+        .pagebuilder-stage-wrapper.stage-full-screen.pagebuilder-header;
+
+        .icon-pagebuilder-fullscreen-exit {
+            .pagebuilder-stage-wrapper.stage-full-screen.pagebuilder-header.icon-pagebuilder-fullscreen-exit;
+        }
+    }
+}
+
+.pagebuilder-wysiwyg-wrapper.pagebuilder-transition-in {
+    .pagebuilder-stage-wrapper {
+        -moz-transition: .175s ease-in-out;
+        -webkit-transition: .175s ease-in-out;
+        opacity: 0;
+        transform: scale(.8) translateZ(0);
+        transition: .175s ease-in-out;
+        visibility: hidden;
+    }
+
+    &.trigger-transition .pagebuilder-stage-wrapper {
+        opacity: 1;
+        transform: scale(1) translateZ(0);
+        visibility: visible;
+    }
+}
+
+.pagebuilder-stage {
+    -moz-transition: margin-left .35s ease-in-out;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    -webkit-transition: margin-left .35s ease-in-out;
+    -webkit-user-select: none;
+    font-size: 0;
+    margin-left: 170px;
+    min-height: 200px;
+    padding: 0;
+    transition: margin-left .35s ease-in-out;
+    user-select: none;
+
+    &.stage-full-screen {
+        background: @color-black;
+    }
+
+    &.pagebuilder-no-user-select {
+        * {
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            -o-user-select: none !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+        }
+    }
+
+    &.panel-collapsed {
+        margin-left: 32px;
+    }
+
+    .pagebuilder-stage-loading {
+        .spinner {
+            font-size: 4rem;
+            left: 50%;
+            margin-left: -2rem;
+            margin-top: -2rem;
+            position: absolute;
+            top: 50%;
+        }
+    }
+
+    .pagebuilder-canvas {
+        -moz-transition: opacity .75s ease-in-out, visibility .75s ease-in-out, padding-top .35s ease-in-out;
+        -webkit-transition: opacity .75s ease-in-out, visibility .75s ease-in-out, padding-top .35s ease-in-out;
+        opacity: 0;
+        padding-bottom: 120px;
+        transition: opacity .75s ease-in-out, visibility .75s ease-in-out, padding-top .35s ease-in-out;
+        visibility: hidden;
+
+        &.active {
+            opacity: 1;
+            position: relative;
+            visibility: visible;
+        }
+    }
+
+    /* Remove aspects fo the UI when taking a screenshot for templates */
+    &.screengrab {
+        border: none;
+        height: 80%;
+        overflow: hidden;
+        padding: 0;
+
+        .pagebuilder-add-row-wrapper {
+            display: none;
+        }
+    }
+}
+
+.pagebuilder-row-wrapper,
+.pagebuilder-structure-wrapper {
+    display: inline-block;
+    vertical-align: top;
+    width: 100%;
+}

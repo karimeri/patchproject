@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+   * Copyright © Magento, Inc. All rights reserved.
+   * See COPYING.txt for license details.
+   */
+-->
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminCustomerSegmentConditionsEditSection">
+        <element name="addCondition" type="text" selector=".rule-param-add.v-middle"/>
+        <element name="conditions" type="select" selector="#conditions__1__new_child"/>
+        <element name="conditionValueChooser" type="button" selector="//a[text()='...']"/>
+        <element name="conditionValue" type="text" selector="#conditions__1--1__value"/>
+        <element name="conditionType" type="button" selector="//li/span/a[text()='ALL']"/>
+        <element name="conditionTypeValue" type="select" selector="#conditions__1--1__aggregator"/>
+        <element name="ruleCondition" type="button" selector="//li[contains(., '{{attributeName}}')]//a[contains(., '{{attributeType}}')]" parameterized="true"/>
+        <element name="attributeEditSelect" type="select" selector="span.rule-param-edit select"/>
+    </section>
+</sections>

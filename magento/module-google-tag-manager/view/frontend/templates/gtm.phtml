@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\GoogleTagManager\Block\Ga $block */
+
+$accountType = $block->getConfig(\Magento\GoogleTagManager\Helper\Data::XML_PATH_TYPE);
+$gtmAccountId = $block->getConfig(\Magento\GoogleTagManager\Helper\Data::XML_PATH_CONTAINER_ID);
+if ($accountType === \Magento\GoogleTagManager\Helper\Data::TYPE_TAG_MANAGER && $gtmAccountId) : ?>
+    <!-- GOOGLE TAG MANAGER -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=<?= /* @escapeNotVerified */ $gtmAccountId ?>"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- END GOOGLE TAG MANAGER -->
+<?php endif; ?>

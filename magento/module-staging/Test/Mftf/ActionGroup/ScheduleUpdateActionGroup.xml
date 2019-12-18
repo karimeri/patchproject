@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="CreateCatalogPriceRule">
+        <arguments>
+            <argument name="websiteName" type="string" defaultValue="Main Website"/>
+            <argument name="customGroupName" type="string" defaultValue="General"/>
+        </arguments>
+        <click selector="{{MarketingSection.marketing}}" stepKey="GoToMarketing"/>
+        <waitForPageLoad stepKey="WaitForMarketingPageLoaded"/>
+        <click selector="{{MarketingSection.catalogPriceRule}}" stepKey="GoToCatalogPriceRule"/>
+        <waitForPageLoad stepKey="WaitForCatalogPriceRulePageLoaded"/>
+        <seeInCurrentUrl url="/catalog_rule" stepKey="CatalogPriceRulePageIsOpened"/>
+        <click selector="{{MarketingSection.addNewRule}}" stepKey="ClickToAddNewRule"/>
+        <waitForPageLoad stepKey="WaitForNewRulePageLoaded"/>
+        <fillField selector="{{MarketingSection.ruleName}}" userInput="{{ScheduleData.name}}" stepKey="TypeRuleName"/>
+        <click selector="{{MarketingSection.selectWebsite(websiteName)}}" stepKey="SelectWebsite"/>
+        <click selector="{{MarketingSection.customerGroup(customGroupName)}}" stepKey="selectCustomGroup"/>
+        <click selector="{{MarketingSection.action}}" stepKey="ClickToOpenActions"/>
+        <fillField selector="{{MarketingSection.discount}}" userInput="25" stepKey="TypeDiscount"/>
+        <click selector="{{MarketingSection.saveAndContinue}}" stepKey="ClickSaveAndContinue"/>
+        <waitForPageLoad stepKey="WaitForRuleSaved"/>
+        <see userInput="You saved the rule." stepKey="verifyRuleSaved"/>
+        <click selector="{{ScheduleUpdateSection.selectUpdate}}" stepKey="ClickToEdit"/>
+        <waitForPageLoad stepKey="WaitForPageOpened"/>
+        <waitForLoadingMaskToDisappear stepKey="waitForLoadingMask"/>
+        <fillField selector="{{MarketingSection.ruleName}}" userInput="{{ScheduleData.newName}}" stepKey="TypeUpdatedRuleName"/>
+        <click selector="{{AdminStagingSlideOutSection.datepickerStartDate}}" stepKey="clickDatePicker"/>
+        <click selector="{{AdminStagingSlideOutSection.datepickerGoToday}}" stepKey="clickGoToday"/>
+        <click selector="{{AdminStagingSlideOutSection.datepickerClose}}" stepKey="clickClose"/>
+        <executeJS function="var date = new Date(jQuery('[name=\'staging[start_time]\']').val()),
+        options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        date.setMinutes(date.getMinutes() + 3);
+        jQuery('[name=\'staging[start_time]\']').val(date.toLocaleString('en-US', options).replace(',', ''))" stepKey="executeJS"/>
+        <executeJS function="jQuery('[name=\'staging[start_time]\']').trigger('change')" stepKey="executeJS2"/>
+        <click selector="{{ScheduleUpdateSection.endDate}}" stepKey="ClickToSetEndDate"/>
+        <click selector="{{ScheduleUpdateSection.year}}" stepKey="ClickToSetYear"/>
+        <click selector="{{AdminStagingSlideOutSection.datepickerGoToday}}" stepKey="clickGoToday2"/>
+        <click selector="{{ScheduleUpdateSection.close}}" stepKey="clickToClose1"/>
+        <executeJS function="var date = new Date(jQuery('[name=\'staging[end_time]\']').val()),
+        options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        date.setMinutes(date.getMinutes() + 9);
+        jQuery('[name=\'staging[end_time]\']').val(date.toLocaleString('en-US', options).replace(',', ''))" stepKey="executeJS3"/>
+        <executeJS function="jQuery('[name=\'staging[end_time]\']').trigger('change')" stepKey="executeJS4"/>
+        <click selector="{{MarketingSection.save}}" stepKey="ClickSave"/>
+        <waitForPageLoad stepKey="WaitForUpdateSaved"/>
+        <click selector="{{MarketingSection.saveRule}}" stepKey="ClickSaveRule1"/>
+        <waitForPageLoad stepKey="WaitForRuleSaved1"/>
+        <see userInput="You saved the rule." stepKey="verifyRuleSaved1"/>
+    </actionGroup>
+    
+    <actionGroup name="ScheduleUpdate">
+        <arguments>
+            <argument name="ruleName" defaultValue="ScheduleData.name"/>
+        </arguments>
+        <click selector="{{ScheduleUpdateSection.update(ruleName)}}" stepKey="ClickOnRule"/>
+        <waitForPageLoad stepKey="WaitForPageOpened"/>
+        <click selector="{{ScheduleUpdateSection.edit}}" stepKey="ClickToEditTheRule"/>
+        <waitForPageLoad stepKey="WaitForPageOpened2"/>
+        <waitForLoadingMaskToDisappear stepKey="waitForLoadingMask"/>
+        <click selector="{{ScheduleUpdateSection.endTime}}" stepKey="ClickToSetEndDate"/>
+        <click selector="{{ScheduleUpdateSection.year}}" stepKey="ClickToSetYear"/>
+        <click selector="{{ScheduleUpdateSection.yearValue(ScheduleData.newYear)}}" stepKey="ClickToSetValue"/>
+        <click selector="{{ScheduleUpdateSection.close}}" stepKey="clickToClose1"/>
+        <click selector="{{MarketingSection.saveRule}}" stepKey="clickToSave"/>
+        <waitForPageLoad stepKey="WaitForUpdateSaved"/>
+        <see userInput='You saved the "New Catalog Price Rule" update.' stepKey="VerifyUpdateIsSaved"/>
+    </actionGroup>
+
+    <actionGroup name="RemoveRule">
+        <arguments>
+            <argument name="ruleName" defaultValue="ScheduleData.newName"/>
+        </arguments>
+        <click selector="{{MarketingSection.marketing}}" stepKey="GoToMarketing"/>
+        <waitForPageLoad stepKey="WaitForMarketingPageLoaded"/>
+        <click selector="{{MarketingSection.catalogPriceRule}}" stepKey="GoToCatalogPriceRule"/>
+        <waitForPageLoad stepKey="WaitForCatalogPriceRulePageLoaded"/>
+        <click selector="{{ScheduleUpdateSection.selectRule(ruleName)}}" stepKey="GoToEditUpdate"/>
+        <waitForPageLoad stepKey="WaitForPageOpened"/>
+        <click selector="{{ScheduleUpdateSection.removeUpdate}}" stepKey="ClickToRemoveUpdate"/>
+        <click selector="{{ScheduleUpdateSection.confirm}}" stepKey="ClickToConfirm"/>
+        <waitForPageLoad stepKey="WaitForRuleIsDeleted"/>
+        <see userInput="You deleted the rule." stepKey="VerifyRuleIsDeleted"/>
+    </actionGroup>
+</actionGroups>

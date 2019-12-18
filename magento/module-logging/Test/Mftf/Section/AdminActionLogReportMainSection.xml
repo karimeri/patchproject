@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminActionLogReportGridSection">
+        <element name="firstRowInTable" type="button" selector="//tr[@data-role='row'][1]"/>
+        <element name="user" type="text" selector="//tr[@data-role='row'][1]/td[@data-column='user']"/>
+        <element name="action" type="text" selector="//tr[@data-role='row'][1]/td[@data-column='action']"/>
+        <element name="actionGroup" type="text" selector="//tr[@data-role='row'][1]/td[@data-column='event']"/>
+        <element name="dateFrom" type="input" selector="//input[@name='time[from]']"/>
+        <element name="dateTo" type="input" selector="//input[@name='time[to]']"/>
+        <element name="search" type="button" selector="//button[@data-ui-id='widget-button-2']"/>
+    </section>
+</sections>

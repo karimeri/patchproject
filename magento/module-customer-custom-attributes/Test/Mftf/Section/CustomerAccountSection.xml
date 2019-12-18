@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="CustomerAccountSection">
+        <element name="stores" type="button" selector="#menu-magento-backend-stores"/>
+        <element name="customerAddress" type="button" selector="//span[text()='Customer Address']"/>
+        <element name="newAttribute" type="button" selector="#add"/>
+        <element name="label" type="input" selector="#attribute_label"/>
+        <element name="code" type="input" selector="#attribute_code"/>
+        <element name="inputType" type="select" selector="#frontend_input"/>
+        <element name="inputFilter" type="select" selector="#input_filter"/>
+        <element name="lineCount" type="input" selector="#multiline_count"/>
+        <element name="sortOrder" type="input" selector="#sort_order"/>
+        <element name="formToUse" type="multiselect" selector="//select[@id='used_in_forms']/option[text()='{{args}}']" parameterized="true"/>
+        <element name="showInSF" type="select" selector="#is_visible"/>
+        <element name="showInSFValue" type="select" selector="//select[@id='is_visible']/option[text()='{{arg1}}']" parameterized="true"/>
+        <element name="valuesRequired" type="select" selector="#is_required"/>
+        <element name="value" type="select" selector="//select[@id='is_required']/option[text()='{{arg2}}']" parameterized="true"/>
+        <element name="save" type="button" selector="#save"/>
+        <element name="multilineCount" type="input" selector="#multiline_count"/>
+        <element name="attributeOption" type="button" selector="#customer_attribute_tabs_options"/>
+        <element name="attribute" type="text" selector="//td[contains(text(), '{{arg3}}')]" parameterized="true"/>
+        <element name="delete" type="button" selector="#delete"/>
+        <element name="confirm" type="button" selector=".action-primary.action-accept"/>
+        <element name="defaultLabel" type="input" selector="#customerAddressAttributeGrid_filter_frontend_label"/>
+        <element name="search" type="button" selector="//div[@class='admin__filter-actions']//span[text()='Search']"/>
+        <element name="reset" type="button" selector="//span[text()='Reset Filter']"/>
+        <element name="createAccount" type="button" selector="input.action.primary"/>
+        <element name="customerAttribute" type="input" selector="//input[contains(@name,'custom_attributes')]"/>
+        <element name="defaultValueDate" type="input" selector="#default_value_date"/>
+        <element name="minimumValueDate" type="input" selector="#date_range_min"/>
+        <element name="maximumValueDate" type="input" selector="#date_range_max"/>
+    </section>
+
+    <section name="AdminCustomerAccountAttributeSection">
+        <element name="fileUpload" type="input" selector="//div[contains(@class,'admin__field')][.//div[contains(@class,'file-uploader-filename')][contains(text(),'{{partialFileName}}')]]/label/span[text()='{{fieldLabelText}}']" parameterized="true"/>
+    </section>
+
+    <section name="AdminCustomerAddressAttributeSection">
+        <element name="firstAttribute" type="text" selector="//*[@id='customerAddressAttributeGrid_table']/tbody/tr[1]/td[contains(@class,'col-attr-code')]"/>
+        <element name="options" type="button" selector="//a[contains(@class,'ui-tabs-anchor')]/span[contains(text(),'Options')]"/>
+        <element name="addOptionsButton" type="button" selector="#add_new_option_button"/>
+        <element name="addOptionsField" type="button" selector="//input[@name='option[value][option_{{arg1}}][0]']" parameterized="true"/>
+        <element name="pageHeader" type="button" selector=".page-header.row"/>
+    </section>
+
+    <section name="AttributeOptionSection">
+        <element name="addOption" type="button" selector="#add_new_option_button"/>
+        <element name="optionField" type="input" selector="//*[@class='new-option'][{{arg}}]//input[@class='input-text required-option required-unique']" parameterized="true"/>
+        <element name="enable" type="button" selector="//*[@class='new-option'][{{arg1}}]//input[@class='input-radio']" parameterized="true"/>
+    </section>
+
+    <section name="StorefrontCustomerAddressAttributeSection">
+        <element name="customAttributeJS" type="text" selector="document.querySelectorAll('[name=\'custom_attributes[{{arg1}}]\']')[{{arg2}}]" parameterized="true"/>
+        <element name="dropdownField" type="select" selector="select[name*='{{arg1}}']" parameterized="true"/>
+        <element name="multiselectField" type="multiselect" selector="option[data-title='{{arg2}}']" parameterized="true"/>
+        <element name="uploadFile" type="file" selector="(//input[@type='file'])[1]" timeout="30"/>
+    </section>
+
+    <section name="AttributeEditSection">
+        <element name="storeView" type="button" selector="#store-change-button"/>
+        <element name="mainWebsiteStoreView" type="text" selector="//a[contains(text(), '{{args}}')]" parameterized="true"/>
+        <element name="saveAndContinue" type="button" selector="#save_and_edit_button"/>
+        <element name="useDefaultForRequiredValues" type="checkbox" selector="#is_required_default"/>
+    </section>
+
+    <section name="AdminCustomerAttributeSection">
+        <element name="manageLabel" type="button" selector="#customer_attribute_tabs_options"/>
+        <element name="searchDefaultLabel" type="input" selector="#customerAttributeGrid_filter_frontend_label"/>
+        <element name="firstAttribute" type="button" selector="//*[@id='customerAttributeGrid_table']/tbody/tr[1]/td[contains(@class,'col-attr-code')]"/>
+    </section>
+
+    <section name="AdminCustomerLastNameAttributeSection">
+        <element name="secondLastNameInput" type="input" selector="//tbody//td[@class='col-store-view'][2]//input"/>
+        <element name="thirdLastNameInput" type="input" selector="//tbody//td[@class='col-store-view'][3]//input"/>
+    </section>
+</sections>

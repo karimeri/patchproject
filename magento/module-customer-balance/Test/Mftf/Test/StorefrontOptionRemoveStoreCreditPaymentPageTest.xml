@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontOptionRemoveStoreCreditPaymentPageTest">
+        <annotations>
+            <features value="CustomerBalance"/>
+            <title value="Option to Remove the Store Credit from the payment page of checkout"/>
+            <description value="Option to Remove the Store Credit from the payment page of checkout"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MAGETWO-96896"/>
+            <useCaseId value="MAGETWO-96851"/>
+            <group value="customerBalance"/>
+        </annotations>
+        <before>
+            <actionGroup ref="LoginActionGroup" stepKey="login"/>
+
+            <!--Create product-->
+            <createData entity="SimpleProduct2" stepKey="createProduct"/>
+            <createData entity="Simple_US_Customer" stepKey="createSimpleUsCustomer">
+                <field key="group_id">1</field>
+            </createData>
+        </before>
+        <after>
+            <!--Delete created data-->
+            <deleteData createDataKey="createSimpleUsCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+
+        <!--Add Store credit balance to customer-->
+        <actionGroup ref="OpenEditCustomerFromAdminActionGroup" stepKey="openCustomerEdit">
+            <argument name="customer" value="$$createSimpleUsCustomer$$" />
+        </actionGroup>
+        <actionGroup ref="UpdateCustomerStoreCreditBalanceAdminActionGroup" stepKey="updateStoreCreditFromAdmin">
+            <argument name="storeCredit" value="500" />
+        </actionGroup>
+
+        <!--Go to Storefront as Customer-->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="customerLogin">
+            <argument name="Customer" value="$$createSimpleUsCustomer$$" />
+        </actionGroup>
+
+        <!-- Add simple product to cart and checkout-->
+        <actionGroup ref="AddSimpleProductToCart" stepKey="addProductToCart">
+            <argument name="product" value="$$createProduct$$"/>
+        </actionGroup>
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckoutFromMinicart"/>
+        <click selector="{{CheckoutShippingSection.next}}" stepKey="clickNext"/>
+
+        <!--Click UseStoreCredit button and check that it works as expected-->
+        <click selector="{{CheckoutStoreCreditSection.useStoreCredit}}" stepKey="clickUseStoreCredit"/>
+        <waitForAjaxLoad stepKey="waitForAjaxLoad"/>
+        <see userInput="Your store credit was successfully applied" stepKey="seeUseStoreCreditSuccessMessage"/>
+        <seeElement selector="{{CheckoutStoreCreditSection.remove}}" stepKey="seeRemoveButton"/>
+        <seeElement selector="{{CheckoutStoreCreditSection.price}}" stepKey="seePrice"/>
+
+        <!--Click Remove button and check that it works as expected-->
+        <click selector="{{CheckoutStoreCreditSection.remove}}" stepKey="clickRemove"/>
+        <waitForAjaxLoad stepKey="waitForLoad"/>
+        <see userInput="The store credit payment has been removed from shopping cart." stepKey="seeRemoveStoreCreditSuccessMessage"/>
+        <dontSeeElement selector="{{CheckoutStoreCreditSection.remove}}" stepKey="dontSeeRemoveButton"/>
+        <dontSeeElement selector="{{CheckoutStoreCreditSection.price}}" stepKey="dontSeePrice"/>
+    </test>
+</tests>

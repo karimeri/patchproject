@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment_all_paypal">
+            <group id="express_checkout">
+                <group id="express_checkout_required">
+                    <group id="express_checkout_required_express_checkout" sortOrder="28">
+                        <field id="api_wizard" showInDefault="0" showInWebsite="0" showInStore="0" />
+                    </group>
+                    <field id="onboarding_wizard" sortOrder="15" showInDefault="1" showInWebsite="1">
+                        <frontend_model>Magento\PaypalOnBoarding\Block\Adminhtml\System\Config\OnBoardingWizard</frontend_model>
+                        <attribute type="shared">1</attribute>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

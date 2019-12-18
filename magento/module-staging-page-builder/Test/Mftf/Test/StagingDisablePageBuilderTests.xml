@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="CheckOrderOfProdsInWidgetOnCMSPageTest">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="disablePageBuilder" after="loginAsAdmin"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="enablePageBuilder" after="logoutOfAdmin"/>
+        </after>
+    </test>
+    <test name="AdminCheckCMSBlockStagedOnWidgetTest">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="disablePageBuilder"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="enablePageBuilder"/>
+        </after>
+    </test>
+    <test name="PageBuilderScheduleUpdateDisablePageBuilderInCMSPage" extends="PageBuilderCmsPageDisablePageBuilder">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify PageBuilder does not appear when disabled in Schedule Update in CMS Page"/>
+            <description value="This test is intended to ensure that PageBuilder does not appear when disabled for Schedule Update in CMS Page."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14864"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-disable"/>
+        </annotations>
+        <before>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCMSPage"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <dontSeeElementInDOM selector="{{AdminCMSPageStagingSlideOutSection.contentArea}}" stepKey="dontSeeContentAreaInDOM"/>
+        <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCMSPage"/>
+        <conditionalClick selector="{{AdminStagingSlideOutSection.contentTab}}" dependentSelector="{{AdminStagingSlideOutSection.stagingContentTab}}" visible="false" stepKey="expandSection"/>
+        <seeElementInDOM selector="{{AdminCMSPageStagingSlideOutSection.contentArea}}" stepKey="seeContentAreaInDOM"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateDisablePageBuilderInCMSBlock" extends="PageBuilderCmsBlockDisablePageBuilder">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Block"/>
+            <title value="Verify PageBuilder does not appear when disabled in Schedule Update in CMS Block"/>
+            <description value="This test is intended to ensure that PageBuilder does not appear when disabled for Schedule Update in CMS Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14962"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-block"/>
+            <group value="pagebuilder-disable"/>
+        </annotations>
+        <before>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCreatedCMSBlockPage"/>
+        </before>
+        <dontSeeElementInDOM selector="{{AdminCMSBlockStagingSlideOutSection.contentArea}}" stepKey="dontSeeContentAreaInDOM"/>
+        <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCreatedCMSBlockPage"/>
+        <seeElementInDOM selector="{{AdminCMSBlockStagingSlideOutSection.contentArea}}" stepKey="seeContentAreaInDOM"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateDisablePageBuilderInCatalogProduct" extends="PageBuilderProductDisablePageBuilder">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - Catalog Product"/>
+            <title value="Verify PageBuilder does not appear when disabled in Schedule Update in Catalog Product"/>
+            <description value="This test is intended to ensure that PageBuilder does not appear when disabled for Schedule Update in Catalog Product."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14963"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-catalog-product"/>
+            <group value="pagebuilder-disable"/>
+        </annotations>
+        <before>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCreatedProductEditPage"/>
+            <actionGroup ref="expandAdminProductSection" stepKey="expandAdminProductSection">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <dontSeeElementInDOM selector="{{AdminCatalogProductStagingSlideOutSection.descriptionTextArea}}" stepKey="dontSeeDescriptionAreaInDOM"/>
+        <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCreatedProductEditPage"/>
+        <actionGroup ref="expandAdminProductSection" stepKey="expandAdminProductSection">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <seeElementInDOM selector="{{AdminCatalogProductStagingSlideOutSection.descriptionTextArea}}" stepKey="seeDescriptionAreaInDOM"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateDisablePageBuilderInCatalogCategory" extends="PageBuilderCatalogCategoryDisablePageBuilder">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - Catalog Category"/>
+            <title value="Verify PageBuilder does not appear when disabled in Schedule Update in Catalog Category"/>
+            <description value="This test is intended to ensure that PageBuilder does not appear when disabled for Schedule Update in Catalog Category."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14964"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-catalog-category"/>
+            <group value="pagebuilder-disable"/>
+        </annotations>
+        <before>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCreatedCategory"/>
+            <actionGroup ref="expandAdminProductSection" stepKey="expandAdminProductSection">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <dontSeeElementInDOM selector="{{AdminCatalogCategoryStagingSlideOutSection.descriptionTextArea}}" stepKey="dontSeeDescriptionAreaInDOM"/>
+        <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToCreatedCategory"/>
+        <actionGroup ref="expandAdminProductSection" stepKey="expandAdminProductSection">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <seeElementInDOM selector="{{AdminCatalogCategoryStagingSlideOutSection.descriptionTextArea}}" stepKey="seeDescriptionAreaInDOM"/>
+    </test>
+</tests>

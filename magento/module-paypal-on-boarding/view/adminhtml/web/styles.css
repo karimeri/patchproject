@@ -1,0 +1,4 @@
+.paypal-connect {background-color: #0070ba; border-color:#005a96; border-radius: 5px; color: #fff !important; margin-top:-30px}
+.paypal-connect:hover,.paypal-connect:active,.paypal-connect:focus {background-color: #005a96;}
+.paypal-connect:before {background: url('images/paypal.svg');background-size: 24px 24px;content: '';display: inline-block;height: 24px;margin:5px 5px 0 0;vertical-align: -50%;width: 24px;}
+.pp-buttons-container {white-space: nowrap;}

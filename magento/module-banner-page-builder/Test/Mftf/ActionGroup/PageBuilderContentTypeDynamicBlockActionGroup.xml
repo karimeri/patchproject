@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="saveDynamicBlock">
+        <!-- This goes in EE repo -->
+        <waitForElementVisible selector="{{AdminBannerBasicActionSection.Save}}" stepKey="waitForDynamicBlockSaveButton"/>
+        <click selector="{{AdminBannerBasicActionSection.Save}}" stepKey="clickDynamicBlockSaveButton"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <see userInput="You saved the dynamic block." stepKey="seeSuccessfulSaveMessage"/>
+    </actionGroup>
+    <actionGroup name="changeDynamicBlockScope">
+        <!-- This goes in EE repo -->
+        <arguments>
+            <argument name="scope" defaultValue="_defaultStore.name"/>
+        </arguments>
+        <waitForElementVisible selector="{{AdminBannerBasicActionSection.Scope}}" stepKey="waitForScopeSelectorToBeVisible"/>
+        <click selector="{{AdminBannerBasicActionSection.Scope}}" stepKey="clickScopeSelector"/>
+        <waitForPageLoad stepKey="waitForScope"/>
+        <waitForElementVisible selector="{{AdminBannerBasicActionSection.ScopeDropdown}}" stepKey="waitForScopeDropdownVisible"/>
+        <waitForPageLoad stepKey="waitForScopeDropdown"/>
+        <click selector="{{AdminBannerBasicActionSection.ScopeOption(scope)}}" stepKey="selectScope"/>
+        <waitForPageLoad stepKey="waitForScopeOptionChange"/>
+        <waitForElementVisible selector="{{AdminBannerBasicActionSection.ScopeModal}}" stepKey="waitForScopeModal"/>
+        <click selector="{{AdminBannerBasicActionSection.ScopeModalConfirm}}" stepKey="confirmScopeModal"/>
+        <waitForPageLoad stepKey="waitForPageLoadAfterScopeModalConfirm"/>
+    </actionGroup>
+    <actionGroup name="saveDynamicBlockForm">
+        <!-- This goes in EE repo -->
+        <waitForElementVisible selector="{{AdminBannerBasicActionSection.SaveContinueEdit}}" stepKey="waitForDynamicBlockSaveButtonToBeVisible"/>
+        <click selector="{{AdminBannerBasicActionSection.SaveContinueEdit}}" stepKey="clickDynamicBlockSaveButton"/>
+        <waitForPageLoad time="30" stepKey="waitForPageToLoadAfterSavingDynamicBlock"/>
+        <see userInput="You saved the dynamic block." stepKey="seeDynamicBlockSuccessMessage"/>
+    </actionGroup>
+    <actionGroup name="searchAndSelectDynamicBlockInGrid">
+        <arguments>
+            <argument name="block" defaultValue=""/>
+        </arguments>
+        <waitForElementVisible selector="{{DynamicBlockOnForm.selectBlockBtn}}" stepKey="waitForSelectBlockBtn"/>
+        <click selector="{{DynamicBlockOnForm.selectBlockBtn}}" stepKey="clickSelectBlockBtn"/>
+        <waitForPageLoad stepKey="waitForGridSlideOut"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.searchBox}}" stepKey="waitForBlockGrid"/>
+        <fillField selector="{{DynamicBlockOnGrid.searchBox}}" userInput="{{block.name}}" stepKey="enterBlockTitle"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <click selector="{{DynamicBlockOnGrid.searchBtn}}" stepKey="clickSearchBtn"/>
+        <waitForPageLoad stepKey="waitForPageLoad2"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.selectBtn(block.name)}}" stepKey="waitForSearchResult"/>
+        <click selector="{{DynamicBlockOnGrid.selectBtn(block.name)}}" stepKey="clickSelectBtn"/>
+        <waitForPageLoad stepKey="waitForPageLoad3"/>
+        <waitForElementVisible selector="{{DynamicBlockOnGrid.addSelectedBtn}}" stepKey="waitForAddSelected"/>
+        <click selector="{{DynamicBlockOnGrid.addSelectedBtn}}" stepKey="clickAddSelected"/>
+        <waitForPageLoad stepKey="waitForPageLoad4"/>
+        <waitForElementVisible selector="{{BlockOnForm.title(block.name)}}" stepKey="waitToSeeBlockTitle"/>
+    </actionGroup>
+    <actionGroup name="validateMenuSectionsAndContentTypes">
+        <seeNumberOfElements selector="{{PageBuilderPanel.allMenuSectionContentTypes('add_content')}}" userInput="3" stepKey="seeNumberOfAddContentMenuSectionContentTypes" after="clickAddContentMenuSection"/>
+        <see userInput="Dynamic Block" selector="{{PageBuilderPanel.addContentMenuSectionContentType}}" after="seeAddContentMenuSectionBlock" stepKey="seeAddContentMenuSectionDynamicBlock"/>
+    </actionGroup>
+</actionGroups>

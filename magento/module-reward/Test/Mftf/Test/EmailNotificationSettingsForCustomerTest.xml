@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="EmailNotificationSettingsForCustomerTest">
+        <annotations>
+            <features value="Reward"/>
+            <stories value="MAGETWO-91647 - Magento not subscribing customer to reward points email notifications"/>
+            <title value="Checking Email Notification Settings for customer"/>
+            <description value="Checking Email Notification Settings for customer"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MAGETWO-94854"/>
+            <group value="reward"/>
+        </annotations>
+
+        <before>
+            <createData entity="RewardPointSetting" stepKey="RewordPointSetting"/>
+        </before>
+        <!--Go to storefront-->
+        <amOnPage url="" stepKey="DoToStorefront"/>
+        <!--Create account-->
+        <actionGroup ref="SignUpNewUserFromStorefrontActionGroup" stepKey="SignUpNewUserFromStorefrontActionGroup">
+            <argument name="Customer" value="Simple_US_Customer"/>
+        </actionGroup>
+        <!--Go to reward points and check checkbox states-->
+        <amOnPage url="{{StorefrontRewardPage.url}}" stepKey="GoToRewardsPage"/>
+        <seeElement selector="{{StorefrontCustomerOrderViewSection.balanceUpdateState}}" stepKey="SubscribeForBalanceUpdatesIsChecked"/>
+        <seeElement selector="{{StorefrontCustomerOrderViewSection.expirationNotificationState}}" stepKey="SubscribeForPointsExpirationNotificationsIsChecked"/>
+    </test>
+</tests>

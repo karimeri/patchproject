@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Ui\Component\Form\Element\Wysiwyg" type="Magento\PageBuilder\Component\Form\Element\Wysiwyg" />
+    <preference for="Magento\Catalog\Ui\Component\Category\Form\Element\Wysiwyg" type="Magento\PageBuilder\Component\Form\Element\Wysiwyg" />
+    <preference for="Magento\Framework\Data\Form\Element\Editor" type="Magento\PageBuilder\Block\Element\Editor" />
+    <preference for="Magento\PageBuilder\Model\ConfigInterface" type="Magento\PageBuilder\Model\Config" />
+    <type name="Magento\PageBuilder\Model\Stage\Config\UiComponentConfig">
+        <arguments>
+            <argument name="configFactory" xsi:type="object">uiComponentConfigFactory</argument>
+        </arguments>
+    </type>
+    <type name="Magento\PageBuilder\Model\Stage\RendererPool">
+        <arguments>
+            <argument name="renderers" xsi:type="array">
+                <item name="default" xsi:type="object">Magento\PageBuilder\Model\Stage\Renderer\Block</item>
+                <item name="products" xsi:type="object">Magento\PageBuilder\Model\Stage\Renderer\WidgetDirective</item>
+                <item name="block" xsi:type="object">Magento\PageBuilder\Model\Stage\Renderer\CmsStaticBlock</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="pagebuilder_block_select_grid_data_source" xsi:type="string">Magento\Cms\Model\ResourceModel\Block\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Attribute\Repository">
+        <plugin name="process_extension_attributes" type="Magento\PageBuilder\Plugin\Catalog\Model\Product\Attribute\RepositoryPlugin"/>
+    </type>
+    <type name="Magento\PageBuilder\Model\Config\CompositeReader">
+        <arguments>
+            <argument name="readers" xsi:type="array">
+                <item name="contentTypeReader" xsi:type="object" sortOrder="10">Magento\PageBuilder\Model\Config\ContentType\Reader</item>
+                <item name="menuSectionReader" xsi:type="object" sortOrder="20">Magento\PageBuilder\Model\Config\MenuSection\Reader</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\PageBuilder\Model\Config\FileResolver">
+        <arguments>
+            <argument name="baseFiles" xsi:type="object">pageBuilderComponentAggregatedSourceBaseSorted</argument>
+        </arguments>
+    </type>
+    <type name="Magento\PageBuilder\Model\WidgetInitializerConfig">
+        <arguments>
+            <argument name="config" xsi:type="array">
+                <item name="slider" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Magento_PageBuilder/js/content-type/slider/appearance/default/widget</item>
+                        <!--optional if you want load widget per appearance-->
+                        <item name="appearance" xsi:type="string">default</item>
+                    </item>
+                </item>
+                <item name="map" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Magento_PageBuilder/js/content-type/map/appearance/default/widget</item>
+                    </item>
+                </item>
+                <item name="row" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Magento_PageBuilder/js/content-type/row/appearance/default/widget</item>
+                    </item>
+                </item>
+                <item name="tabs" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Magento_PageBuilder/js/content-type/tabs/appearance/default/widget</item>
+                    </item>
+                </item>
+                <item name="slide" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <!--required argument-->
+                        <item name="component" xsi:type="string">Magento_PageBuilder/js/widget/show-on-hover</item>
+                        <!--optional if you need provide some config for your widget-->
+                        <item name="config" xsi:type="array">
+                            <item name="buttonSelector" xsi:type="string">.pagebuilder-slide-button</item>
+                            <item name="showOverlay" xsi:type="string">hover</item>
+                            <item name="dataRole" xsi:type="string">slide</item>
+                        </item>
+                    </item>
+                </item>
+                <item name="banner" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Magento_PageBuilder/js/widget/show-on-hover</item>
+                        <item name="config" xsi:type="array">
+                            <item name="buttonSelector" xsi:type="string">.pagebuilder-banner-button</item>
+                            <item name="showOverlay" xsi:type="string">hover</item>
+                            <item name="dataRole" xsi:type="string">banner</item>
+                        </item>
+                    </item>
+                </item>
+                <item name="buttons" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Magento_PageBuilder/js/content-type/buttons/appearance/inline/widget</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="pageBuilderComponentAggregatedSourceBase" type="Magento\PageBuilder\Model\View\File\Collector\PageBuilder">
+        <arguments>
+            <argument name="subDir" xsi:type="string">pagebuilder</argument>
+        </arguments>
+    </virtualType>
+    <virtualType shared="false" name="pageBuilderComponentAggregatedSourceBaseFiltered" type="Magento\Framework\View\File\Collector\Decorator\ModuleOutput">
+        <arguments>
+            <argument name="subject" xsi:type="object">pageBuilderComponentAggregatedSourceBase</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="pageBuilderComponentAggregatedSourceBaseSorted" type="Magento\Framework\View\File\Collector\Decorator\ModuleDependency">
+        <arguments>
+            <argument name="subject" xsi:type="object">pageBuilderComponentAggregatedSourceBaseFiltered</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\PageBuilder\Block\Adminhtml\ContentType\Edit\ModalCancelButton" type="Magento\PageBuilder\Block\Adminhtml\ContentType\Edit\CancelButton">
+        <arguments>
+            <argument name="targetName" xsi:type="string">ns = pagebuilder_map_form, index = map_location_modal</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="pageBuilderProductCollectionFactory" type="Magento\Catalog\Model\ResourceModel\Product\CollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Magento\PageBuilder\Ui\DataProvider\Product\ProductCollection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\CatalogWidget\Block\Product\ProductsList">
+        <arguments>
+            <argument name="productCollectionFactory" xsi:type="object">pageBuilderProductCollectionFactory</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Helper\Output">
+        <arguments>
+            <argument name="directivePatterns" xsi:type="array">
+                <item name="backgroundImage" xsi:type="const">\Magento\PageBuilder\Plugin\Filter\TemplatePlugin::BACKGROUND_IMAGE_PATTERN</item>
+                <item name="htmlContentType" xsi:type="const">\Magento\PageBuilder\Plugin\Filter\TemplatePlugin::HTML_CONTENT_TYPE_PATTERN</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Session\SidResolver">
+        <plugin name="pagebuilder_preview_sid_resolving" type="Magento\PageBuilder\Plugin\Framework\Session\SidResolver" />
+    </type>
+</config>

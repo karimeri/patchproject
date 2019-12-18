@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminStagingSlideOutSection">
+        <!-- This goes in EE repo -->
+        <element name="previewModal" type="button" selector=".modals-wrapper button#preview" timeout="30"/>
+        <element name="stagingContentTab" type="button" selector="//aside[contains(@class,'_show')]//div[@data-role='content']//span[text()='Content']//ancestor::div[@data-index='content']//div[contains(@class,'admin__fieldset-wrapper-content') and contains(@class,'_show')]"/>
+        <element name="saveButton" type="button" selector=".modals-wrapper button#save:nth-of-type({{index}})" timeout="30" parameterized="true"/>
+    </section>
+    <section name="AdminCMSPageStagingSlideOutSection">
+        <!-- This goes in EE repo -->
+        <element name="contentArea" type="text" selector="#cmsstaging_page_update_form_content"/>
+    </section>
+    <section name="AdminCMSBlockStagingSlideOutSection">
+        <!-- This goes in EE repo -->
+        <element name="contentArea" type="text" selector="#cmsstaging_block_update_form_content"/>
+    </section>
+    <section name="AdminCatalogProductStagingSlideOutSection">
+        <!-- This goes in EE repo -->
+        <element name="descriptionTextArea" type="text" selector="#catalogstaging_update_form_description"/>
+    </section>
+    <section name="AdminCatalogCategoryStagingSlideOutSection">
+        <!-- This goes in EE repo -->
+        <element name="descriptionTextArea" type="text" selector="#catalogstaging_category_update_form_description"/>
+    </section>
+</sections>

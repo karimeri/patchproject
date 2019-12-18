@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Block\Onepage">
+        <arguments>
+            <argument name="layoutProcessors" xsi:type="array">
+                <item name="addressFormCustomAttributes" xsi:type="object" sortOrder="50">Magento\CustomerCustomAttributes\Block\Checkout\LayoutProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Customer\Block\Address\Edit">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="check_attributes_on_render" xsi:type="array">
+                    <item name="telephone" xsi:type="string">telephone</item>
+                    <item name="company" xsi:type="string">company</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

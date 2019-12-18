@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="CheckoutStoreCreditSection">
+        <element name="useStoreCredit" type="button" selector="#use-customer-balance"/>
+        <element name="remove" type="button" selector="//div[@class='opc-block-summary']//button[@id='delete-customer-balance']"/>
+        <element name="price" type="text" selector="//tr[@class='totals balance']//span[@class='price']"/>
+    </section>
+</sections>

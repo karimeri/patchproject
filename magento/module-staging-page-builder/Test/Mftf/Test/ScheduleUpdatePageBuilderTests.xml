@@ -1,0 +1,1063 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="PageBuilderScheduleUpdateCMSPageAddAndEditButtons">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Add and Edit Buttons from CMS Page Schedule Update"/>
+            <description value="Verify that a user can add and edit buttons to CMS Page content from the staging slide out"/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-4231"/>
+            <testCaseId value="MC-11892"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-buttonGroup"/>
+            <group value="pagebuilder-buttonItem"/>
+        </annotations>
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCMSPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage1"/>
+            <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandPanelGroup">
+                <argument name="contentType" value="PageBuilderButtonsContentType"/>
+            </actionGroup>
+            <actionGroup ref="dragContentTypeToContainer" stepKey="dragContentTypeToStage">
+                <argument name="contentType" value="PageBuilderButtonsContentType"/>
+            </actionGroup>
+            <actionGroup ref="inlineEditButton" stepKey="inlineEditButton">
+                <argument name="text" value="PageBuilderButtonItemText_OneCharacter"/>
+            </actionGroup>
+            <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideOut"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage2">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage"/>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <!-- Add Button Group -->
+        <comment userInput="Add Button Group" stepKey="commentAddButtonGroup"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandPanelGroup">
+            <argument name="contentType" value="PageBuilderButtonsContentType"/>
+            <argument name="pageBuilderArea" value="{{AdminStagingSlideOutSection.cmsStagingPageBase}}"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToDropZone" stepKey="dragContentTypeToDropZone">
+            <argument name="contentType" value="PageBuilderButtonsContentType"/>
+            <argument name="contentTypeIndex" value="2"/>
+            <argument name="containerTargetType" value="PageBuilderRowContentType"/>
+            <argument name="containerTargetIndex" value="1"/>
+            <argument name="dropZoneIndex" value="2"/>
+            <argument name="pageBuilderArea" value="{{AdminStagingSlideOutSection.cmsStagingPageBase}}"/>
+        </actionGroup>
+        <!-- Edit New Button Item -->
+        <comment userInput="Edit New Button Item" stepKey="commentEditNewButton"/>
+        <actionGroup ref="openPageBuilderEditPanelSmallByIndex" stepKey="openContentEditMenuOnStage">
+            <argument name="section" value="ButtonItemOnStage"/>
+            <argument name="targetIndex" value="2"/>
+        </actionGroup>
+        <actionGroup ref="fillSlideOutPanelFieldGeneral" stepKey="enterButtonText">
+            <argument name="property" value="PageBuilderButtonItemText_First"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings2">
+            <argument name="baseContent" value="{{AdminStagingSlideOutSection.title}}"/>
+        </actionGroup>
+        <!-- Add 2nd Button Item to Second Button Group -->
+        <comment userInput="Add 2nd Button Item to Second Button Group" stepKey="commentAddButtonItem"/>
+        <actionGroup ref="addChildContentTypeFromOptionMenu" stepKey="addChildContentType">
+            <argument name="contentType" value="PageBuilderButtonsContentType"/>
+            <argument name="index" value="2"/>
+            <argument name="pageBuilderArea" value="{{AdminStagingSlideOutSection.cmsStagingPageBase}}"/>
+        </actionGroup>
+        <actionGroup ref="inlineEditButton" stepKey="inlineEditButton2">
+            <argument name="text" value="PageBuilderButtonItemText_Common"/>
+            <argument name="index" value="3"/>
+            <argument name="pageBuilderArea" value="{{AdminStagingSlideOutSection.cmsStagingPageBase}}"/>
+        </actionGroup>
+        <!-- Validate Schedule Update Stage -->
+        <comment userInput="Validate Schedule Update Stage" stepKey="commentValidateScheduleUpdateStage"/>
+        <actionGroup ref="validateButtonItemContent" stepKey="validateButton1ScheduleUpdateStage">
+            <argument name="page" value="ButtonItemOnStage"/>
+            <argument name="text" value="PageBuilderButtonItemText_OneCharacter"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="validateButtonItemContent" stepKey="validateButton2ScheduleUpdateStage">
+            <argument name="page" value="ButtonItemOnStage"/>
+            <argument name="text" value="PageBuilderButtonItemText_First"/>
+            <argument name="index" value="2"/>
+        </actionGroup>
+        <actionGroup ref="validateButtonItemContent" stepKey="validateButton3ScheduleUpdateStage">
+            <argument name="page" value="ButtonItemOnStage"/>
+            <argument name="text" value="PageBuilderButtonItemText_Common"/>
+            <argument name="index" value="3"/>
+        </actionGroup>
+        <!-- Save Schedule Update -->
+        <comment userInput="Save Schedule Update" stepKey="commentSaveScheduleUpdate"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="createAndSaveScheduleUpdateOneDayInFuture">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <!-- Validate Preview -->
+        <comment userInput="Validate Preview" stepKey="validatePreview"/>
+        <actionGroup ref="openPreviewForScheduledUpdate" stepKey="openPreviewForScheduledUpdate"/>
+        <seeNumberOfElements selector="{{ButtonItemOnStorefront.all}}" userInput="3" stepKey="seeThreeButtonsStorefront"/>
+        <actionGroup ref="validateButtonItemContent" stepKey="validateButton1Storefront">
+            <argument name="page" value="ButtonItemOnStorefrontEmptyLink"/>
+            <argument name="text" value="PageBuilderButtonItemText_OneCharacter"/>
+            <argument name="index" value="1"/>
+        </actionGroup>
+        <actionGroup ref="validateButtonItemContent" stepKey="validateButton2Storefront">
+            <argument name="page" value="ButtonItemOnStorefrontEmptyLink"/>
+            <argument name="text" value="PageBuilderButtonItemText_First"/>
+            <argument name="index" value="2"/>
+        </actionGroup>
+        <actionGroup ref="validateButtonItemContent" stepKey="validateButton3Storefront">
+            <argument name="page" value="ButtonItemOnStorefrontEmptyLink"/>
+            <argument name="text" value="PageBuilderButtonItemText_Common"/>
+            <argument name="index" value="3"/>
+        </actionGroup>
+        <closeTab stepKey="closeTab"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateAddAndEditRowColumnSlide" extends="PageBuilderCatalogProductAddAndEditRowColumnSlide">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Add and Edit Row, Column, and Slider to PageBuilder from Schedule Update"/>
+            <description value="This test is intended to ensure that basic adding and editing of multiple content types work correctly in the Schedule Update area of PageBuilder."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13828"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-row"/>
+            <group value="pagebuilder-column"/>
+            <group value="pagebuilder-slide"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanMoveContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanMoveContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="verify that user can move content types from on-hover option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can move content types from the on-hover option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13830"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-column"/>
+            <group value="pagebuilder-heading"/>
+            <group value="pagebuilder-divider"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandGroupElements" before="dragColumnToRow">
+            <argument name="contentType" value="PageBuilderDividerContentType"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanEditContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanEditContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can edit content types from on-hover option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can edit content types from the on-hover option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13833"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-row"/>
+            <group value="pagebuilder-edit"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <actionGroup ref="closeEditPanelSettings" stepKey="closeEditPanelSettings" after="seeBackgroundColorOnEditPanel"/>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanDuplicateContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanDuplicateContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can duplicate content types from on-hover option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can duplicate content types from the on-hover option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13834"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-row"/>
+            <group value="pagebuilder-duplicate"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanDeleteContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanDeleteContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can delete content types from on-hover option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can delete content types from the on-hover option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13835"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-divider"/>
+            <group value="pagebuilder-delete"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <!-- Saving Schedule Update After Delete -->
+        <comment userInput="Save Schedule Update After Delete" stepKey="commentSaveProductAfterDelete"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreenAfterDelete"/>
+        <actionGroup ref="saveScheduleUpdate" stepKey="saveProductAfterDelete">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSectionAfterDelete"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescriptionAfterDelete"/>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdate" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanAddChildContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanAddChildContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="verify that user can add child content types from on-hover option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can add child content types from the on-hover option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13849"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-add"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanEditContentTypesFromOnClickOptionMenus" extends="PageBuilderCatalogProductVerifyCanEditContentTypesFromOnClickOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can edit content types from on-click option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can edit content types from the on-click option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13851"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-slide"/>
+            <group value="pagebuilder-edit"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <actionGroup ref="closeEditPanelSettings" stepKey="closeEditPanelSettings" after="seeBackgroundColorOnEditPanel"/>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanDuplicateContentTypesFromOnClickOptionMenus" extends="PageBuilderCatalogProductVerifyCanDuplicateContentTypesFromOnClickOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can duplicate content types from on-click option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can duplicate content types from the on-click option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13854"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-duplicate"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanDeleteContentTypesFromOnClickOptionMenus" extends="PageBuilderCatalogProductVerifyCanDeleteContentTypesFromOnClickOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can delete content types from on-click option menus from Schedule Update"/>
+            <description value="This test is intended to ensure that users can delete content types from the on-click option menus within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13862"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-delete"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCreatedProductEditPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+            <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+            <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate" after="openPageBuilderForDescription"/>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="commentCreateScheduleNewUpdate"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToStagingSlideout">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <comment userInput="---merging to remove step---" stepKey="deleteCreatedCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveProduct"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveProduct">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSection">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreenAfterDelete"/>
+        <actionGroup ref="saveScheduleUpdate" stepKey="saveProductAfterDelete">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="expandAdminProductSectionAfterDelete">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescriptionAfterDelete">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="openPageBuilderForDescription">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToProductStorefront"/>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanMoveButtonItems" extends="ButtonItemMoveButtonStackedAppearance">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can move button items from Schedule Update"/>
+            <description value="This test is intended to ensure that users can move button items within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13866"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct" before="logout"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveAndContinueEditCmsPage">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="openEditFormForStagingSlideOut" after="saveAndContinueEditCmsPage">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToStoreFront"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanMoveSlideItems" extends="SlideItemMoveSlideItemsToRearrange">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can move slide items from Schedule Update"/>
+            <description value="This test is intended to ensure that users can move slide items within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-13902"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-slide"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct" before="logout"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSaveScheduleUpdate" before="saveAndContinueEditCmsPage"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveAndContinueEditCmsPage">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="openEditFormForStagingSlideOut" after="saveAndContinueEditCmsPage">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <!-- Validate Stage -->
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage1">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate Stage After Sorting -->
+        <seeElement selector="{{SlideOnBackend.messageContent('2', PageBuilderSlideItemContent_Slide3.value)}}" stepKey="seeSlide1ContentAfterSort"/>
+        <see userInput="{{PageBuilderSlideItemSlideName_Slide3.value}}" selector="{{SliderOnStage.slideNavigationDotNameTooltip('1')}}" stepKey="seeSlideName1InTooltipAfterSort"/>
+        <seeElement selector="{{SlideOnBackend.messageContent('2', PageBuilderSlideItemContent_Slide3.value)}}" stepKey="seeSlide2ContentAfterSort"/>
+        <actionGroup ref="saveScheduleUpdate" stepKey="saveAndContinueEditCmsPage1">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="openStagingSlideOut" after="saveAndContinueEditCmsPage1">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage2">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate Stage After Saving -->
+        <seeElement selector="{{SlideOnBackend.messageContent('1', PageBuilderSlideItemContent_Slide1.value)}}" stepKey="seeSlide3ContentAfterSave2"/>
+        <see userInput="{{PageBuilderSlideItemSlideName_Slide1.value}}" selector="{{SliderOnStage.slideNavigationDotNameTooltip('1')}}" stepKey="seeSlideName3InTooltipAfterSave2"/>
+        <see userInput="{{PageBuilderSlideItemSlideName_Slide3.value}}" selector="{{SliderOnStage.slideNavigationDotNameTooltip('1')}}" stepKey="seeSlideName1InTooltipAfterSave2"/>
+        <seeElement selector="{{SlideOnBackend.messageContent('2', PageBuilderSlideItemContent_Slide3.value)}}" stepKey="seeSlideContentAfterSave2"/>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToStoreFront"/>
+        <see userInput="{{PageBuilderSlideItemContent_Slide1.value}}" selector="{{SlideOnFrontend.slickSlideIndex('0')}}" stepKey="seeSlide1ContentDisplayed"/>
+        <see userInput="{{PageBuilderSlideItemContent_Slide3.value}}" selector="{{SlideOnFrontend.slickSlideIndex('1')}}" stepKey="seeSlide2ContentDisplayed"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateVerifyCanMoveTabItems" extends="TabsRearrangeTabItems">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that user can move tab items from Schedule Update"/>
+            <description value="This test is intended to ensure that users can move tab items within the PageBuilder stage for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14846"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-tab"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct" before="logout"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <!-- Rearrange Tab Order -->
+        <actionGroup ref="moveTabItem" stepKey="moveTabItem">
+            <argument name="tabItemIndexToMove" value="1"/>
+            <argument name="tabItemIndexToMoveTo" value="3"/>
+        </actionGroup>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSavePage"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveAndContinueEditCmsPage">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="openEditFormForStagingSlideOut" after="saveAndContinueEditCmsPage">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+        <!-- Validate staging preview -->
+        <comment userInput="Validate staging preview" stepKey="commentValidateStorefront"/>
+        <actionGroup ref="openPreviewForScheduledUpdateFromSlideOut" stepKey="navigateToStoreFront"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateFullScreenCoversEntireScreen" extends="PageBuilderFullScreenCoversEntireScreen">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Verify that full-screen mode covers entire screen from Schedule Update"/>
+            <description value="This test is to ensure that the PageBuilder full-screen mode covers the entire screen when opened for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14850"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-fullScreen"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct" before="logout"/>
+        </after>
+    </test>
+    <test name="PageBuilderScheduleUpdateFullScreenLeftPanelHeightAndFunctionality" extends="PageBuilderFullScreenLeftPanelHeightAndFunctionality">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Left panel is full-height and works in full-screen mode from Schedule Update"/>
+            <description value="This test is to ensure that the PageBuilder left panel works and grows to span the full height of the viewport in full-screen mode when opened for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14851"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-fullScreen"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct" before="logout"/>
+        </after>
+    </test>
+    <test name="PageBuilderScheduleUpdateFullScreenCanAddAndEditContentTypes" extends="PageBuilderFullScreenCanAddAndEditContentTypes">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="Can add and edit content types in full-screen mode from Schedule Update"/>
+            <description value="This test is to ensure that the user can successfully add and edit content types in full-screen mode when opened for Schedule Update."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14859"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-fullScreen"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout" after="navigateToAPageWithPageBuilder"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct" before="logout"/>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <!-- Saving Schedule Update -->
+        <comment userInput="Saving Schedule Update" stepKey="commentSavePage"/>
+        <actionGroup ref="createAndSaveScheduleUpdateOneDayInFuture" stepKey="saveAndContinueEditCmsPage">
+            <argument name="stagingUpdate" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="openEditFormForStagingSlideOut" stepKey="openEditFormForStagingSlideOut" after="saveAndContinueEditCmsPage">
+            <argument name="schedule" value="_defaultPageBuilderStaging"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+            <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+            <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+        </actionGroup>
+    </test>
+    <test name="PageBuilderScheduleUpdateIsVisibleInCMSPage">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Page"/>
+            <title value="PageBuilder is visible from Schedule Update in CMS Page"/>
+            <description value="This test is to ensure that the user can see and add a content type in PageBuilder stage for Schedule Update in a CMS Page."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14870"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-page"/>
+            <group value="pagebuilder-tab"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToCMSPage" stepKey="navigateToCMSPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="navigateToStagingSlideout" stepKey="navigateToStagingSlideout"/>
+            <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage"/>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <seeElement selector="{{PageBuilderStage.stageWrapper}}" stepKey="seeElementPageBuilderStage"/>
+        <actionGroup ref="dragContentTypeToContainer" stepKey="dragTabsContentTypeToStage">
+            <argument name="contentType" value="PageBuilderTabsContentType"/>
+            <argument name="pageBuilderArea" value="{{AdminStagingSlideOutSection.cmsStagingPageBase}}"/>
+        </actionGroup>
+        <see selector="{{TabOnStage.tabHeader('1')}}" userInput="{{PageBuilderTabName1Default.value}}" stepKey="seeTab1NameStage"/>
+    </test>
+    <test name="PageBuilderScheduleUpdateIsVisibleInCMSBlock" extends="PageBuilderScheduleUpdateIsVisibleInCMSPage">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - CMS Block"/>
+            <title value="PageBuilder is visible from Schedule Update in CMS Block"/>
+            <description value="This test is to ensure that the user can see and add a content type in PageBuilder stage for Schedule Update in a CMS Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14906"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-cms-block"/>
+            <group value="pagebuilder-tab"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsBlock" stepKey="createCMSPage"/>
+            <actionGroup ref="navigateToCreatedCMSBlockPage" stepKey="navigateToCMSPage">
+                <argument name="CMSBlockPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <actionGroup ref="dragContentTypeToContainer" stepKey="dragTabsContentTypeToStage">
+            <argument name="contentType" value="PageBuilderTabsContentType"/>
+            <argument name="containerTargetIndex" value="2"/>
+            <argument name="pageBuilderArea" value="{{AdminStagingSlideOutSection.cmsStagingPageBase}}"/>
+        </actionGroup>
+    </test>
+    <test name="PageBuilderScheduleUpdateIsVisibleInProducts" extends="PageBuilderScheduleUpdateIsVisibleInCMSPage">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - Catalog Product"/>
+            <title value="PageBuilder is visible from Schedule Update in Catalog Products"/>
+            <description value="This test is to ensure that the user can see and add a content type in PageBuilder stage for Schedule Update in Catalog Products"/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14907"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-catalog-product"/>
+            <group value="pagebuilder-tab"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCategory" stepKey="createCMSPage"/>
+            <createData entity="_defaultProduct" stepKey="createProduct" after="createCMSPage">
+                <requiredEntity createDataKey="createCMSPage"/>
+            </createData>
+            <actionGroup ref="navigateToCreatedProductEditPage" stepKey="navigateToCMSPage">
+                <argument name="product" value="$$createProduct$$"/>
+            </actionGroup>
+            <actionGroup ref="expandAdminProductSection" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+            <actionGroup ref="openPageBuilderForAttribute" stepKey="openPageBuilderForDescription" after="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createProduct" stepKey="deleteCreatedProduct" after="deleteCMSPage"/>
+            <actionGroup ref="NavigateToAndResetProductGridToDefaultView" stepKey="NavigateToAndResetProductGridToDefaultView" after="deleteCreatedProduct"/>
+        </after>
+        <seeElement selector="{{PageBuilderStage.stageWrapperFullScreen}}" stepKey="seeElementPageBuilderStage"/>
+        <actionGroup ref="dragContentTypeToContainer" stepKey="dragTabsContentTypeToStage">
+            <argument name="contentType" value="PageBuilderTabsContentType"/>
+        </actionGroup>
+    </test>
+    <test name="PageBuilderScheduleUpdateIsVisibleInCategory" extends="PageBuilderScheduleUpdateIsVisibleInCMSPage">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Schedule Update - Catalog Category"/>
+            <title value="PageBuilder is visible from Schedule Update in Catalog Category"/>
+            <description value="This test is to ensure that the user can see and add a content type in PageBuilder stage for Schedule Update in Catalog Category."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-5773"/>
+            <testCaseId value="MC-14914"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-catalog-category"/>
+            <group value="pagebuilder-tab"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultCategory" stepKey="createCMSPage"/>
+            <actionGroup ref="navigateToCreatedCategory" stepKey="navigateToCMSPage">
+                <argument name="Category" value="$$createCMSPage$$"/>
+            </actionGroup>
+            <actionGroup ref="expandAdminProductSection" stepKey="switchToPageBuilderStage">
+                <argument name="sectionSelector" value="{{AdminStagingSlideOutSection.contentTab}}"/>
+                <argument name="sectionDependentSelector" value="{{AdminStagingSlideOutSection.stagingContentTab}}"/>
+            </actionGroup>
+            <actionGroup ref="openPageBuilderForAttribute" stepKey="openPageBuilderForDescription" after="switchToPageBuilderStage"/>
+        </before>
+        <seeElement selector="{{PageBuilderStage.stageWrapperFullScreen}}" stepKey="seeElementPageBuilderStage"/>
+        <actionGroup ref="dragContentTypeToContainer" stepKey="dragTabsContentTypeToStage">
+            <argument name="contentType" value="PageBuilderTabsContentType"/>
+        </actionGroup>
+    </test>
+</tests>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontApplyCategoryPermissionsToSecondWebsiteTest">
+        <annotations>
+            <features value="CatalogPermissions"/>
+            <stories value="Apply Category Permissions to Website 2"/>
+            <title value="Apply Category Permissions to Website 2"/>
+            <description value="This test verifies that if one category has different permissions for different Website they will be applied correctly"/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MAGETWO-89347"/>
+            <group value="catalog_permissions"/>
+            <skip>
+                <issueId value="MC-12964"/>
+            </skip>
+        </annotations>
+        <before>
+            <createData entity="customWebsite" stepKey="createCustomWebsite"/>
+            <createData entity="secondCustomWebsite" stepKey="createCustomWebsite2"/>
+
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="AdminStoreGroupCreateActionGroup" stepKey="createNewStore">
+                <argument name="Website" value="customWebsite"/>
+                <argument name="storeGroup" value="customStoreGroup"/>
+            </actionGroup>
+            <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createCustomStoreView">
+                <argument name="StoreGroup" value="customStoreGroup"/>
+                <argument name="customStore" value="customStoreEN"/>
+            </actionGroup>
+
+            <actionGroup ref="AdminStoreGroupCreateActionGroup" stepKey="createNewStore2">
+                <argument name="Website" value="secondCustomWebsite"/>
+                <argument name="storeGroup" value="staticStoreGroup"/>
+            </actionGroup>
+            <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createCustomStoreView2">
+                <argument name="StoreGroup" value="staticStoreGroup"/>
+                <argument name="customStore" value="customStoreFR"/>
+            </actionGroup>
+
+            <actionGroup ref="EnableCatalogCategoryPermissionActionGroup" stepKey="enableCatalogCategoryPermission"/>
+            <actionGroup ref="EnableWebUrlOptions" stepKey="addStoreCodeToUrls"/>
+        </before>
+        <after>
+            <actionGroup ref="DeleteCustomWebsiteActionGroup" stepKey="deleteWebsite">
+                <argument name="websiteName" value="$createCustomWebsite.website[name]$"/>
+            </actionGroup>
+            <actionGroup ref="DeleteCustomWebsiteActionGroup" stepKey="deleteWebsite2">
+                <argument name="websiteName" value="$createCustomWebsite2.website[name]$"/>
+            </actionGroup>
+            <actionGroup ref="DisableCatalogCategoryPermissionActionGroup" stepKey="disableCatalogCategoryPermission"/>
+            <actionGroup ref="ResetWebUrlOptions" stepKey="ResetWebUrlOptions"/>
+            <!--Delete Category and Product-->
+            <actionGroup ref="DeleteCategory" stepKey="deleteCategory">
+                <argument name="categoryEntity" value="SimpleSubCategory"/>
+            </actionGroup>
+            <actionGroup ref="deleteProductBySku" stepKey="deleteProduct">
+                <argument name="sku" value="{{SimpleProduct.sku}}"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logoutOfAdmin"/>
+        </after>
+        <!--Add new category and fill all necessary fields-->
+        <actionGroup ref="goToCreateCategoryPage" stepKey="goToCreateCategoryPage"/>
+        <actionGroup ref="fillCategoryForm" stepKey="fillCategoryForm">
+            <argument name="categoryEntity" value="SimpleSubCategory"/>
+        </actionGroup>
+        <!--Open Category Permissions tab-->
+        <scrollTo selector="{{AdminCategoryPermissionsSection.sectionHeader}}" stepKey="scrollToCategoryPermissionsSection"/>
+        <click selector="{{AdminCategoryPermissionsSection.sectionHeader}}" stepKey="openCategoryPermissionsSection"/>
+        <!--Create Category Permissions for Website 1-->
+        <click selector="{{AdminCategoryPermissionsSection.newPermissionButton}}" stepKey="clickNewPermissionButton"/>
+        <selectOption selector="{{AdminCategoryPermissionsSection.selectWebsite('1')}}" userInput="$createCustomWebsite.website[name]$" stepKey="chooseWebsite"/>
+        <selectOption selector="{{AdminCategoryPermissionsSection.selectCustomerGroup('1')}}" userInput="All Customer Groups" stepKey="chooseCustomerGroup"/>
+        <click selector="{{AdminCategoryPermissionsSection.grantCatalogCategoryView('1','allow')}}" stepKey="grantCatalogCategoryView"/>
+        <click selector="{{AdminCategoryPermissionsSection.grantCatalogProductPrice('1','allow')}}" stepKey="grantCatalogProductPrice"/>
+        <click selector="{{AdminCategoryPermissionsSection.grantCheckoutItems('1','deny')}}" stepKey="grantCheckoutItems"/>
+        <!--Create Category Permissions for Website 2-->
+        <click selector="{{AdminCategoryPermissionsSection.newPermissionButton}}" stepKey="clickNewPermissionButton2"/>
+        <selectOption selector="{{AdminCategoryPermissionsSection.selectWebsite('2')}}" userInput="$createCustomWebsite2.website[name]$" stepKey="chooseWebsite2"/>
+        <selectOption selector="{{AdminCategoryPermissionsSection.selectCustomerGroup('2')}}" userInput="All Customer Groups" stepKey="chooseCustomerGroup2"/>
+        <click selector="{{AdminCategoryPermissionsSection.grantCatalogCategoryView('2','deny')}}" stepKey="grantCatalogCategoryView2"/>
+        <!--Create Category Permissions for All Websites-->
+        <click selector="{{AdminCategoryPermissionsSection.newPermissionButton}}" stepKey="clickNewPermissionButton3"/>
+        <selectOption selector="{{AdminCategoryPermissionsSection.selectWebsite('3')}}" userInput="All Websites" stepKey="chooseWebsite3"/>
+        <selectOption selector="{{AdminCategoryPermissionsSection.selectCustomerGroup('3')}}" userInput="All Customer Groups" stepKey="chooseCustomerGroup3"/>
+        <click selector="{{AdminCategoryPermissionsSection.grantCatalogCategoryView('3','allow')}}" stepKey="grantCatalogCategoryView3"/>
+        <click selector="{{AdminCategoryPermissionsSection.grantCatalogProductPrice('3','allow')}}" stepKey="grantCatalogProductPrice3"/>
+        <click selector="{{AdminCategoryPermissionsSection.grantCheckoutItems('3','allow')}}" stepKey="grantCheckoutItems3"/>
+        <!--Save Category-->
+        <actionGroup ref="saveCategoryForm" stepKey="saveCategoryForm"/>
+
+        <!--Create new product, at Websites tab select all three websites, at categories tab select created category-->
+        <actionGroup ref="FillAdminSimpleProductForm" stepKey="createProduct">
+            <argument name="category" value="SimpleSubCategory"/>
+            <argument name="simpleProduct" value="SimpleProduct"/>
+        </actionGroup>
+        <actionGroup ref="SelectProductInWebsitesActionGroup" stepKey="setWebsite2">
+            <argument name="website" value="$createCustomWebsite.website[name]$"/>
+        </actionGroup>
+        <actionGroup ref="ProductSetWebsite" stepKey="setWebsite3">
+            <argument name="website" value="$createCustomWebsite2.website[name]$"/>
+        </actionGroup>
+
+        <!--Open Website 1 and check Category is present-->
+        <amOnPage url="{{StorefrontStoreHomePage.url(customStoreEN.code)}}" stepKey="goToCustomWebsite"/>
+        <waitForPageLoad stepKey="waitForStoreENLoaded" />
+        <seeElement selector="{{StorefrontHeaderSection.NavigationCategoryByName(SimpleSubCategory.name)}}" stepKey="seeCategory"/>
+        <!--Open Category and Check Add to Cart button are absent-->
+        <click selector="{{StorefrontHeaderSection.NavigationCategoryByName(SimpleSubCategory.name)}}" stepKey="openCategory"/>
+        <waitForPageLoad stepKey="waitForCatPageLoaded" />
+        <moveMouseOver selector="{{StorefrontCategoryProductSection.ProductInfoByName(SimpleProduct.name)}}" stepKey="moveMouseOverProduct" />
+        <dontSeeElement selector="{{StorefrontCategoryProductSection.ProductAddToCartByName(SimpleProduct.name)}}" stepKey="dontSeeAddToCartButton" />
+        <!--Open Product and check price is present and Add to Cart button are absent-->
+        <click selector="{{StorefrontCategoryProductSection.ProductInfoByName(SimpleProduct.name)}}" stepKey="goToProductPage" />
+        <waitForPageLoad stepKey="waitForProductLoaded" />
+        <see selector="{{StorefrontProductInfoMainSection.productPrice}}" userInput="{{SimpleProduct.price}}" stepKey="seeProductPrice"/>
+        <dontSeeElement selector="{{StorefrontProductActionSection.addToCart}}" stepKey="dontSeeAddToCartButtonOnProductPage" />
+
+        <!--Open Website 2 and check Category is absent-->
+        <amOnPage url="{{StorefrontStoreHomePage.url(customStoreFR.code)}}" stepKey="goToSecondCustomWebsite"/>
+        <waitForPageLoad stepKey="waitForStoreFRLoaded" />
+        <dontSeeElement selector="{{StorefrontHeaderSection.NavigationCategoryByName(SimpleSubCategory.name)}}" stepKey="dontSeeCategory"/>
+        <!--Open Product on Website 2-->
+        <amOnPage url="{{StorefrontStoreHomePage.url(customStoreFR.code)}}{{SimpleProduct.urlKey}}.html" stepKey="goToProductPage2"/>
+        <waitForPageLoad stepKey="waitForStoreFRProductLoaded" />
+        <see selector="{{StorefrontProductInfoMainSection.productName}}" userInput="Whoops, our bad..." stepKey="seeWhoops"/>
+        <dontSee selector="{{StorefrontProductInfoMainSection.productName}}" userInput="{{SimpleProduct.name}}" stepKey="dontSeeProduct"/>
+
+        <!--Open Website 3(Main Website) and check Category is present-->
+        <amOnPage url="{{StorefrontStoreHomePage.url(_defaultStore.code)}}" stepKey="goToMainWebsite"/>
+        <waitForPageLoad stepKey="waitForMainWebSite" />
+        <seeElement selector="{{StorefrontHeaderSection.NavigationCategoryByName(SimpleSubCategory.name)}}" stepKey="seeCategory2"/>
+        <!--Open Category and Check Add to Cart button are present-->
+        <click selector="{{StorefrontHeaderSection.NavigationCategoryByName(SimpleSubCategory.name)}}" stepKey="openCategory2"/>
+        <waitForPageLoad stepKey="waitForSubCategoryPageLoaded" />
+        <moveMouseOver selector="{{StorefrontCategoryProductSection.ProductInfoByName(SimpleProduct.name)}}" stepKey="moveMouseOverProduct2" />
+        <seeElement selector="{{StorefrontCategoryProductSection.ProductAddToCartByName(SimpleProduct.name)}}" stepKey="seeAddToCartButton" />
+        <!--Open Product and check price and Add to Cart button are present-->
+        <click selector="{{StorefrontCategoryProductSection.ProductInfoByName(SimpleProduct.name)}}" stepKey="goToProductPage3"/>
+        <waitForPageLoad stepKey="waitForProductPageLoaded" />
+        <see selector="{{StorefrontProductInfoMainSection.productPrice}}" userInput="{{SimpleProduct.price}}" stepKey="seeProductPrice2"/>
+        <seeElement selector="{{StorefrontProductActionSection.addToCart}}" stepKey="seeAddToCartButtonOnProductPage" />
+    </test>
+</tests>

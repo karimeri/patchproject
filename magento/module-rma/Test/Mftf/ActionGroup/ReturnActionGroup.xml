@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+
+    <actionGroup name="createReturns">
+        <arguments>
+            <argument name="customer"/>
+        </arguments>
+        <click selector="{{AdminOrderDetailsMainActionsSection.createReturn}}" stepKey="clickCreateReturns"/>
+        <seeInCurrentUrl url="{{AdminReturnNewPage.url}}" stepKey="seeNewReturnPage"/>
+        <see selector="{{AdminNewReturnOrderInformationSection.customerName}}" userInput="{{customer.firstname}}" stepKey="seeReturnCustomerName"/>
+        <see selector="{{AdminNewReturnOrderInformationSection.emailAddress}}" userInput="{{customer.email}}" stepKey="seeReturnCustomerEmail"/>
+    </actionGroup>
+
+    <actionGroup name="goToReturnItemsTab">
+        <click selector="{{AdminReturnInformationSection.returnItems}}" stepKey="clickReturnItemsTab"/>
+    </actionGroup>
+
+    <actionGroup name="addReturnItem">
+        <arguments>
+            <argument name="product"/>
+        </arguments>
+        <click selector="{{AdminReturnItemsSection.addProducts}}" stepKey="clickAddReturnProducts"/>
+        <fillField selector="{{AdminReturnItemsSection.productNameFilter}}" userInput="{{product.name}}" stepKey="filterReturnItemsGrid"/>
+        <checkOption selector="{{AdminReturnItemsSection.selectRow('1')}}" stepKey="selectSimpleProductReturn"/>
+        <click selector="{{AdminReturnItemsSection.addSelectedProducts}}" stepKey="clickAddSelectedProductsToReturn"/>
+    </actionGroup>
+
+    <actionGroup name="submitReturnItem">
+        <arguments>
+            <argument name="item" type="return_item" defaultValue="SampleReturnItem"/>
+        </arguments>
+        <fillField selector="{{AdminReturnItemsSection.requested('1')}}" userInput="{{item.qty_requested}}" stepKey="fillRequestedReturnQty"/>
+        <selectOption selector="{{AdminReturnItemsSection.returnReason('1')}}" userInput="{{item.reason}}" stepKey="selectReturnReason"/>
+        <fillField selector="{{AdminReturnItemsSection.returnReasonOther('1')}}" userInput="{{item.reason_other}}" stepKey="fillReturnReason"/>
+        <selectOption selector="{{AdminReturnItemsSection.itemCondition('1')}}" userInput="{{item.condition}}" stepKey="selectReturnItemCondition"/>
+        <selectOption selector="{{AdminReturnItemsSection.resolution('1')}}" userInput="{{item.resolution}}" stepKey="selectReturnResolution"/>
+        <click selector="{{AdminNewReturnMainActionsSection.submitReturns}}" stepKey="clickSubmitReturns"/>
+    </actionGroup>
+
+    <actionGroup name="filterReturnsByOrder">
+        <arguments>
+            <argument name="orderId" type="string"/>
+        </arguments>
+        <seeInCurrentUrl url="{{AdminReturnIndexPage.url}}" stepKey="seeOnRmaIndexPage"/>
+        <click selector="{{AdminReturnGridFilterSection.resetFilter}}" stepKey="clearExistingRmaFilters"/>
+        <fillField selector="{{AdminReturnGridFilterSection.orderIdFilter}}" userInput="{{orderId}}" stepKey="fillOrderIdRmaFilter"/>
+        <see selector="{{AdminReturnGridSection.rowOrderId('1')}}" userInput="{{orderId}}" stepKey="seeReturnInGrid"/>
+        <click selector="{{AdminGridFilterControls.applyFilters}}" stepKey="clickSearchReturn"/>
+        <click selector="{{AdminReturnGridSection.rowViewAction('1')}}" stepKey="clickViewReturnFromGrid"/>
+        <seeInCurrentUrl url="{{AdminReturnEditPage.url}}" stepKey="seeOnRmaEditPage"/>
+    </actionGroup>
+
+    <actionGroup name="processingReturnItem">
+        <arguments>
+            <argument name="process"/>
+        </arguments>
+        <fillField selector="{{AdminReturnItemsSection.selectProcess(process.process_type)}}" userInput="{{process.qty}}" stepKey="fillRequestedReturnQty"/>
+        <selectOption selector="{{AdminReturnItemsSection.selectStatus}}" userInput="{{process.status_type}}" stepKey="selectReturnStatus"/>
+        <click selector="{{AdminEditReturnMainActionsSection.saveContinue}}" stepKey="clickOnSaveAndContinue"/>
+        <see selector="{{AdminReturnItemsSection.successMessage}}" userInput="You saved the RMA request." stepKey="seeSuccessMessage"/>
+    </actionGroup>
+
+    <actionGroup name="verifyReturnProcessedAndClosed">
+        <arguments>
+            <argument name="qty" type="string"/>
+            <argument name="item" type="return_item"/>
+            <argument name="product_entity"/>
+        </arguments>
+        <see selector="{{AdminReturnItemsSection.itemCheck('product')}}" userInput="{{product_entity.name}}" stepKey="seeProductName"/>
+        <see selector="{{AdminReturnItemsSection.itemCheck('sku')}}" userInput="{{product_entity.sku}}" stepKey="seeProductSku"/>
+        <see selector="{{AdminReturnItemsSection.itemCheck('condition')}}" userInput="{{item.condition}}" stepKey="seeItemCondition"/>
+        <see selector="{{AdminReturnItemsSection.itemCheck('resolution')}}" userInput="{{item.resolution}}" stepKey="seeItemResolution"/>
+        <see selector="{{AdminReturnItemsSection.itemCheck('status')}}" userInput="Approved" stepKey="seeItemStatus"/>
+        <see selector="{{AdminReturnItemsSection.itemProcess('ordered')}}" userInput="{{qty}}" stepKey="seeItemRemaining"/>
+        <see selector="{{AdminReturnItemsSection.itemProcess('requested')}}" userInput="{{qty}}" stepKey="seeItemRequested"/>
+        <see selector="{{AdminReturnItemsSection.itemProcess('authorized')}}" userInput="{{qty}}" stepKey="seeItemAuthorized"/>
+        <see selector="{{AdminReturnItemsSection.itemProcess('returned')}}" userInput="{{qty}}" stepKey="seeItemReturned"/>
+        <see selector="{{AdminReturnItemsSection.itemProcess('approved')}}" userInput="{{qty}}" stepKey="seeItemApproved"/>
+    </actionGroup>
+    
+    <actionGroup name="VerifyReturnItemActionGroup" extends="verifyReturnProcessedAndClosed">
+        <remove keyForRemoval="seeItemRemaining"/>
+        <remove keyForRemoval="seeItemAuthorized"/>
+        <remove keyForRemoval="seeItemReturned"/>
+        <remove keyForRemoval="seeItemApproved"/>
+        <see selector="{{AdminReturnItemsSection.itemCheck('status')}}" userInput="{{item.status}}" after="seeItemResolution" stepKey="seeItemStatus"/>
+    </actionGroup>
+
+    <!--Check that required fields for return item are actually required-->
+    <actionGroup name="checkReturnItemRequiredFields">
+        <seeElement selector="{{AdminReturnItemsSection.productSku('1')}}" stepKey="seeOnReturnItemsGrid"/>
+        <click selector="{{AdminNewReturnMainActionsSection.submitReturns}}" stepKey="tryToSubmitReturn"/>
+        <seeInCurrentUrl url="{{AdminReturnNewPage.url}}" stepKey="seeStillOnNewReturnPage"/>
+        <see selector="{{AdminReturnItemsSection.requestedError('1')}}" userInput="This is a required field." stepKey="seeRequestedFieldRequired"/>
+        <see selector="{{AdminReturnItemsSection.returnReasonError('1')}}" userInput="This is a required field." stepKey="seeReturnReasonFieldRequired"/>
+        <see selector="{{AdminReturnItemsSection.itemConditionError('1')}}" userInput="This is a required field." stepKey="seeItemConditionFieldRequired"/>
+        <see selector="{{AdminReturnItemsSection.resolutionError('1')}}" userInput="This is a required field." stepKey="seeResolutionFieldRequired"/>
+    </actionGroup>
+
+    <!--Set Admin Return Attributes Condition Config -->
+    <actionGroup name="SetAdminReturnAttributesConditionConfig">
+        <arguments>
+            <argument name="valueRequiredItem" type="string"/>
+            <argument name="showOnStorefrontItem" type="string"/>
+        </arguments>
+        <!--Add wait option to avoid some issue with getting access to RMA attribute page-->
+        <wait stepKey="waitForRMAPageLoaded" time="60"/>
+        <amOnPage url="{{AdminReturnAttributesPage.url}}" stepKey="amOnAdminReturnAttributesPage"/>
+        <waitForPageLoad stepKey="waitForReturnsAttributePageLoaded"/>
+        <click selector="{{AdminReturnAttributesPageSection.conditionItem}}" stepKey="openConditionAttribute"/>
+        <waitForPageLoad stepKey="waitForConditionAttributePageOpened"/>
+        <selectOption selector="{{AdminReturnAttrItemConditionSection.valueRequired}}" userInput="{{valueRequiredItem}}" stepKey="selectValueRequiredNo"/>
+        <selectOption selector="{{AdminReturnAttrItemConditionSection.showOnStorefront}}" userInput="{{showOnStorefrontItem}}" stepKey="selectShowOnStorefrontNo"/>
+        <click stepKey="clickSaveAttributeButton" selector="{{AdminReturnAttrItemConditionSection.saveAttribute}}"/>
+        <waitForPageLoad stepKey="waitForSavingAttribute"/>
+        <see userInput="You saved the RMA item attribute." stepKey="seeSuccessSavingMessage"/>
+    </actionGroup>
+</actionGroups>

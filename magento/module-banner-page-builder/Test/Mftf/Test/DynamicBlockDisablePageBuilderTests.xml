@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AddMediaGalleryToBanner">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="enableWYSIWYG"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="AdminAddNestedBannerWithImageTest">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" before="loginAsAdmin"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="logout"/>
+        </after>
+    </test>
+    <test name="InsertDefaultMagentoVariableIntoWYSIWYGOnBannerPages">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="switchToTinyMCE4"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="AdminCreateBannerWithCategoryLink">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="switchToTinyMCE4"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="AdminApplyBannerToDifferentAdminRole">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="enableWYSIWYG"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="AdminCreateEditBannerForSpecificStoreView">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="enableWYSIWYG"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="AssociateCustomerSegmentToBanner">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="enableWYSIWYG"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="DefaultTinyMCEv4onBannerPage">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="switchToTinyMCE4"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="DynamicBlockWithProductListWidget">
+        <before>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="turnOffPageBuilder" after="switchToTinyMCE4"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="turnOnPageBuilder" after="disableWYSIWYG"/>
+        </after>
+    </test>
+    <test name="PageBuilderDynamicBlockDisablePageBuilderAndWYSIWYG">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Admin should not be able to see PageBuilder on Dynamic Block Page after disable PageBuilder and disable WYSIWYG from Configuration"/>
+            <description value="Admin should not be able to see PageBuilder on Dynamic Block Page after disable PageBuilder and disable WYSIWYG from Configuration"/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MAGETWO-71404"/>
+            <testCaseId value="MC-2405"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-disable"/>
+        </annotations>
+        <before>
+            <magentoCLI command="config:set cms/wysiwyg/enabled disabled" stepKey="disableWYSIWYG"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedDynamicBlock">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="removeHTMLContentType">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="confirmRemovalModal"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="enablePageBuilder"/>
+            <magentoCLI command="config:set cms/wysiwyg/enabled enabled" stepKey="enableWYSIWYG"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandPageBuilderPanelMenuSection">
+            <argument name="contentType" value="PageBuilderTextContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragButtonsOntoStage">
+            <argument name="contentType" value="PageBuilderTextContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStage">
+            <argument name="contentType" value="PageBuilderTextContentType"/>
+        </actionGroup>
+        <fillField selector="{{TextOnConfiguration.textArea}}" userInput="Hello Dynamic Block from PageBuilder" stepKey="addTextToEditor"/>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="saveEditPanelSettings"/>
+        <executeJS function="return document.evaluate(&quot;{{TextOnStage.textArea('1')}}&quot;, document.body).iterateNext().value" stepKey="actualData"/>
+        <assertEquals stepKey="assertTextValue">
+            <expectedResult type="string">Hello Dynamic Block from PageBuilder</expectedResult>
+            <actualResult type="variable">actualData</actualResult>
+        </assertEquals>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveDynamicBlock"/>
+        <magentoCLI command="config:set cms/wysiwyg/enabled enabled" stepKey="enableWYSIWYG"/>
+        <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="disablePageBuilderSetting"/>
+        <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedDynamicBlock">
+            <argument name="Banner" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <seeElement selector="{{TinyMCESection.TinyMCE4}}" stepKey="seeTinyMCE4Visible"/>
+        <executeJS function="return (function() {var div = document.createElement('div'); div.innerHTML = tinymce.activeEditor.getContent(); return div.innerText.trim();}())" stepKey="textFromPageBuilder"/>
+        <assertEquals stepKey="assertEquals1" message="pass">
+            <expectedResult type="string">Hello Dynamic Block from PageBuilder</expectedResult>
+            <actualResult type="variable">textFromPageBuilder</actualResult>
+        </assertEquals>
+    </test>
+    <test name="PageBuilderDynamicBlockDisablePageBuilder">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify PageBuilder does not appear when disabled in Dynamic Block"/>
+            <description value="This test is intended to ensure that PageBuilder does not appear when disabled for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15171"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-disable"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+        </before>
+        <after>
+            <magentoCLI command="config:set cms/pagebuilder/enabled 1" stepKey="enablePageBuilder"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedProduct">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <seeElement selector="{{PageBuilderStage.stageWrapper}}" stepKey="seeElementPageBuilderStage"/>
+        <dontSeeElementInDOM selector="{{BannerContentSection.content_textarea}}" stepKey="dontSeeContentAreaInDOM"/>
+        <magentoCLI command="config:set cms/pagebuilder/enabled 0" stepKey="disablePageBuilder"/>
+        <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+            <argument name="Banner" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <seeElementInDOM selector="{{BannerContentSection.content_textarea}}" stepKey="seeContentAreaInDOM"/>
+        <dontSeeElementInDOM selector="{{PageBuilderStage.stageWrapper}}" stepKey="dontSeePageBuilderStage"/>
+    </test>
+</tests>

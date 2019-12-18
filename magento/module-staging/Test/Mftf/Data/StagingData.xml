@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="_staging" type="stage">
+        <data key="update_name">Test Update Name</data>
+        <data key="start_date">02/9/2030</data>
+    </entity>
+    <entity name="_defaultStaging" type="stage">
+        <data key="name" unique="suffix">Test Update Name</data>
+        <data key="description">Test Update Description</data>
+        <data key="entityName"  unique="suffix">New entity name</data>
+    </entity>
+    <entity name="S5UpdateNameStaging" type="stage">
+        <data key="updateName" unique="suffix">S5UpdateName</data>
+        <data key="updateDescription">S5UpdateDescription</data>
+        <data key="viewedit">View/Edit</data>
+    </entity>
+    <entity name="S8UpdateNameStaging" type="stage">
+        <data key="updateName" unique="suffix">S8UpdateName</data>
+        <data key="updateDescription">S8UpdateDescription</data>
+    </entity>
+    <entity name="S18UpdateNameStaging" type="stage">
+        <data key="updateName" unique="suffix">S18UpdateName</data>
+        <data key="updateDescription">S18UpdateDescription</data>
+    </entity>
+    <entity name="UpdateWithoutEnd" type="Stage">
+        <data key="updateName">UpdateWithoutEnd</data>
+        <data key="updateDescription">Description: Update Width Out End</data>
+        <data key="scheduleMinutesAhead">3</data>
+        <data key="endDate"> </data>
+        <data key="productPrice">12</data>
+        <data key="start">Start</data>
+        <data key="end"> </data>
+        <data key="viewedit">View/Edit</data>
+        <data key="preview">Preview</data>
+    </entity>
+</entities>

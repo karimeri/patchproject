@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminCreateNewBlockSection">
+        <element name="isEnabled" type="button" selector="//label[@class='admin__actions-switch-label']"/>
+        <element name="blockTitle" type="input" selector="//input[@name='title']"/>
+        <element name="identifier" type="input" selector="//input[@name='identifier']"/>
+        <element name="storeView" type="select" selector="//select[@name='store_id']"/>
+        <element name="allStoreView" type="text" selector="//option[@data-title='All Store Views']"/>
+        <element name="content" type="input" selector="//textarea[@name='content']"/>
+        <element name="save" type="button" selector="//button[@id='save-button']"/>
+        <element name="blockName" type="text" selector="//div[@class='page-title-wrapper']"/>
+    </section>
+    <section name="AdminUpdateBlockSection">
+        <element name="scheduleNewUpdate" type="button" selector="//button[@id='staging_update_new']"/>
+        <element name="updateName" type="input" selector="//input[@name='staging[name]']"/>
+        <element name="startDate" type="input" selector="//input[@name='staging[start_time]']"/>
+        <element name="saveUpdate" type="button" selector="//button[@id='save']"/>
+        <element name="preview" type="text" selector="//a[contains(text(), 'Preview')]"/>
+        <element name="calendar" type="text" selector="//*[@class='staging-preview-header']//*[normalize-space()='{{calendar}}']" parameterized="true"/>
+        <element name="scope" type="text" selector="//*[@class='staging-preview-header']//*[contains(text(), '{{scope}}')]" parameterized="true"/>
+        <element name="blockContent" type="text" selector="//div[normalize-space()='{{content}}']" parameterized="true"/>
+        <element name="isEnabled" type="button" selector="//div[@class='modal-content']//label[@class='admin__actions-switch-label']"/>
+    </section>
+</sections>

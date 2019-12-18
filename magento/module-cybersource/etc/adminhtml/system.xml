@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="cybersource" translate="label" type="text" sortOrder="34" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Cybersource</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="payment_action" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment Action</label>
+                    <source_model>Magento\Cybersource\Model\Adminhtml\Source\PaymentAction</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+                <field id="merchant_id" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Merchant ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="transaction_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Transaction Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="profile_id" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Profile ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="access_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Access Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="secret_key" translate="label" type="obscure" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Secret Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="webhook_url" translate="label comment" type="text" sortOrder="61" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Webhook URL</label>
+                    <comment><![CDATA[Webhook URL should be set in your Cybersource account as Transaction Response Page.]]></comment>
+                    <attribute type="handler_url">cybersource/SilentOrder/TokenResponse</attribute>
+                    <frontend_model>Magento\Cybersource\Block\Adminhtml\System\Config\Field\WebhookUrl</frontend_model>
+                </field>
+                <field id="is_multidomain" translate="label" type="select" sortOrder="62" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Is admin panel works on the different domain?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Use this option when an admin panel works on the different domain</comment>
+                </field>
+                <field id="admin_profile_id" translate="label" type="obscure" sortOrder="63" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Admin Profile ID</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="is_multidomain">1</field>
+                    </depends>
+                </field>
+                <field id="admin_access_key" translate="label" type="obscure" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Admin Access Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="is_multidomain">1</field>
+                    </depends>
+                </field>
+                <field id="admin_secret_key" translate="label" type="obscure" sortOrder="68" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Admin Secret Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="is_multidomain">1</field>
+                    </depends>
+                </field>
+                <field id="webhook_url_admin" translate="label comment" type="text" sortOrder="69" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Admin Webhook URL</label>
+                    <comment><![CDATA[Webhook URL should be set in your Cybersource account as Transaction Response Page.]]></comment>
+                    <attribute type="handler_url">cybersource/SilentOrder/TokenResponse</attribute>
+                    <attribute type="is_admin">1</attribute>
+                    <frontend_model>Magento\Cybersource\Block\Adminhtml\System\Config\Field\WebhookUrl</frontend_model>
+                    <depends>
+                        <field id="is_multidomain">1</field>
+                    </depends>
+                </field>
+                <field id="order_status" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>New Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                </field>
+                <field id="sandbox_flag" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Test Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="cctypes" translate="label" type="multiselect" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Credit Card Types</label>
+                    <source_model>Magento\Cybersource\Model\Adminhtml\Source\Cctype</source_model>
+                </field>
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="170" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment from Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                </field>
+                <field id="min_order_total" translate="label" type="text" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Minimum Order Total</label>
+                </field>
+                <field id="max_order_total" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Maximum Order Total</label>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                    <frontend_class>validate-number</frontend_class>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

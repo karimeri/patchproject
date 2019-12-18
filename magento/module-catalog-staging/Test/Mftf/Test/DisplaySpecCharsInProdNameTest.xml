@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="DisplaySpecCharsInProdNameTest">
+        <annotations>
+            <features value="Catalog"/>
+            <title value="Displayig special characters in Product name"/>
+            <description value="Displayig special characters in Product name"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MAGETWO-98189"/>
+            <useCaseId value="MAGETWO-65232"/>
+            <group value="Catalog"/>
+        </annotations>
+        <before>
+            <createData entity="Simple_US_CA_Customer" stepKey="createCustomer"/>
+            <createData entity="ApiCategory" stepKey="category"/>
+            <createData entity="ApiSimpleProductWithSpecCharInName" stepKey="product">
+                <requiredEntity createDataKey="category"/>
+            </createData>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="product" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <actionGroup ref="AdminOrdersGridClearFiltersActionGroup" stepKey="clearOrderGridFilters"/>
+            <actionGroup ref="ClearProductsFilterActionGroup" stepKey="clearProductsFilter"/>
+            <actionGroup ref="StagingDashboardClearFiltersActionGroup" stepKey="clearStagingFilters"/>
+            <actionGroup ref="clearInvoicesGridFilters" stepKey="clearInvoicesGridFilters"/>
+            <actionGroup ref="logout" stepKey="logOut"/>
+        </after>
+        <!--Go to products page-->
+        <comment userInput="Go to products page" stepKey="goToProductsPage"/>
+        <amOnPage url="{{AdminCatalogProductPage.url}}" stepKey="navigateToProductsPage"/>
+        <actionGroup ref="filterProductGridBySku" stepKey="filterProductGridBySku">
+            <argument name="product" value="$$product$$"/>
+        </actionGroup>
+        <!--Assert product name-->
+        <comment userInput="Assert product name" stepKey="assertProductName"/>
+        <grabTextFrom selector="{{AdminProductGridSection.firstProductRowName}}"  stepKey="grabProductName"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}"  actual="($grabProductName)" stepKey="assertProdName"/>
+        <!--Go to created product page-->
+        <comment userInput="Go to created product page" stepKey="goToCreatedProductPage"/>
+        <amOnPage url="{{AdminProductEditPage.url($$product.id$$)}}" stepKey="navigateToProductPage"/>
+        <!--Assert product name-->
+        <comment userInput="Assert product name" stepKey="assertProductName2"/>
+        <grabTextFrom selector="{{AdminCategoryContentSection.categoryPageTitle}}"  stepKey="grabProductTitle"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="($grabProductTitle)" stepKey="assertProdTitle"/>
+        <!--Click 'Schedule New Update' button-->
+        <comment userInput="Click 'Schedule New Update' button" stepKey="clickScheduleNewUpdateButton"/>
+        <click selector="{{AdminStagingSlideOutSection.scheduleNewUpdateBtn}}" stepKey="clickButtonScheduleNewUpdate"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <!--Fill in required fields and click 'Save' button-->
+        <comment userInput="Fill in required fields and click 'Save' button" stepKey="clickOnSaveButton"/>
+        <generateDate date="+1 day" format="m/j/Y g:i A" stepKey="generateStartDate"/>
+        <generateDate date="+3 day" format="m/j/Y g:i A" stepKey="generateEndDate"/>
+        <actionGroup ref="FillScheduleUpdateWithCheckEndActionGroup" stepKey="createScheduleUpdate">
+            <argument name="staging" value="S5UpdateNameStaging"/>
+            <argument name="timeStart" value="{$generateStartDate}"/>
+            <argument name="timeEnd" value="{$generateEndDate}"/>
+        </actionGroup>
+        <!--Go to Content Staging Dashboard and enter staging update edit page-->
+        <comment userInput="Go to Content Staging Dashboard and enter staging update edit page" stepKey="enterStagingUpdateEditPage"/>
+        <amOnPage url="{{AdminStagingDashboardPage.url}}" stepKey="goToStagingDashboard"/>
+        <fillField selector="{{AdminAssignToExistingUpdateSection.searchStagingName}}" userInput="{{S5UpdateNameStaging.updateName}}" stepKey="fillSearchStagingName"/>
+        <click selector="{{AdminAssignToExistingUpdateSection.submitSearch}}" stepKey="clickOnSearch"/>
+        <waitForPageLoad stepKey="waitForPageLoad5"/>
+        <click selector="{{AdminScheduledChangesSection.scheduleName(S5UpdateNameStaging.updateName)}}" stepKey="clickOnUpdateName"/>
+        <waitForElementVisible selector="{{AdminScheduledChangesSection.viewEditButton}}" stepKey="waitViewEditButtonToBeVisible"/>
+        <click selector="{{AdminScheduledChangesSection.viewEditButton}}" stepKey="clickViewEdit"/>
+        <waitForPageLoad stepKey="waitForStagingUpdateEditPageLoad"/>
+        <!--Expand 'Products' section-->
+        <comment userInput="Expand 'Products' section" stepKey="expandProdsSection"/>
+        <click selector="{{AdminStagingEditSection.productsTab}}" stepKey="expandProductsSection"/>
+        <waitForPageLoad stepKey="waitForStagingUpdateEditPageLoad2"/>
+        <!--Assert product name and SKU in the grid-->
+        <comment userInput="Assert product name and SKU in the grid" stepKey="assertProdNameAndSKU"/>
+        <grabTextFrom selector="{{AdminStagingEditSection.productNameInProductsTab}}"  stepKey="grabProductName2"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}"  actual="($grabProductName2)" stepKey="assertProdName1"/>
+        <grabTextFrom selector="{{AdminStagingEditSection.productSKUInProductsTab}}"  stepKey="grabProductSKUFromItemsOrderedSection"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKUFromItemsOrderedSection" stepKey="assertProductSKUFromItemsOrderedSection"/>
+        <!--Go to Storefront as logged in Customer  -->
+        <comment userInput="Go to Storefront as logged in Customer" stepKey="goToStorefront"/>
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="customerLogin">
+            <argument name="Customer" value="$$createCustomer$$" />
+        </actionGroup>
+        <!--Assert product name in Storefront category page-->
+        <comment userInput="Assert product name in Storefront category page" stepKey="assertProdName2"/>
+        <amOnPage url="{{StorefrontCategoryPage.url($$category.name$$)}}" stepKey="onCategoryPage"/>
+        <grabTextFrom selector="{{StorefrontCategoryMainSection.productLink}}"  stepKey="grabProductNameFromStorefront"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="($grabProductNameFromStorefront)" stepKey="assertProductNameFromStorefront"/>
+        <!--Assert product name in Storefront product info section-->
+        <comment userInput="Assert product name in Storefront product info section" stepKey="assertProdName3"/>
+        <click selector="{{StorefrontCategoryMainSection.productLink}}" stepKey="openProductPageOnStorefront"/>
+        <grabTextFrom selector="{{StorefrontProductInfoMainSection.productName}}"  stepKey="grabProductNameFromStorefront2"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="($grabProductNameFromStorefront2)" stepKey="assertProductNameFromStorefront2"/>
+        <!--Assert product name from breadcrumbs-->
+        <comment userInput="Assert product name from breadcrumbs" stepKey="assertProdName4"/>
+        <grabTextFrom selector="{{StorefrontNavigationSection.categoryBreadcrumbsByNumber('3')}}"  stepKey="grabProductNameFromBreadcrumbs"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="($grabProductNameFromBreadcrumbs)" stepKey="assertProductNameFromBreadcrumbs"/>
+        <!--Add the product to Wish List-->
+        <comment userInput="Add the product to Wish List" stepKey="addProdToWishList"/>
+        <click selector="{{StorefrontProductPageSection.addToWishlist}}" stepKey="addProductToWishList"/>
+        <!--Assert product name in the page and notification-->
+        <comment userInput="Assert product name in the page and notification" stepKey="assertProdName5"/>
+        <grabTextFrom selector="{{StorefrontMessagesSection.success}}"  stepKey="grabProductNameFromNotification"/>
+        <assertContains expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromNotification" stepKey="assertProductNameFromNotification"/>
+        <grabTextFrom selector="{{StorefrontCategoryMainSection.productName}}"  stepKey="grabProductNameFromWishListPage"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromWishListPage" stepKey="assertProductNameFromWishListPage"/>
+        <!--Add the product to Cart-->
+        <comment userInput="Add the product to Cart" stepKey="addProdToCart"/>
+        <moveMouseOver selector="{{StorefrontCategoryMainSection.ProductItemInfo}}" stepKey="hoverOverProduct"/>
+        <!--wait for 'add to cart' button to be visible-->
+        <comment userInput="wait for 'add to cart' button to be visible" stepKey="waitButtonToBeVisible"/>
+        <waitForElementVisible selector="{{StorefrontCatalogSearchMainSection.AddToCartBtn}}" stepKey="waitAddToCardButtonToBeVisible"/>
+        <click selector="{{StorefrontCatalogSearchMainSection.AddToCartBtn}}" stepKey="addSimpleProductToCart"/>
+        <!--Assert product name in the notification-->
+        <comment userInput="Assert product name in the notification" stepKey="assertProdName6"/>
+        <waitForElementVisible selector="{{StorefrontMessagesSection.success}}" stepKey="waitSuccessMessageToBeVisible"/>
+        <grabTextFrom selector="{{StorefrontMessagesSection.success}}"  stepKey="grabProductNameFromNotification2"/>
+        <assertContains expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromNotification2" stepKey="assertProductNameFromNotification2"/>
+        <!--Click on the Mini Cart-->
+        <comment userInput="Click on the Mini Cart" stepKey="clickOnMiniCart"/>
+        <waitForPageLoad stepKey="waitForMiniCart"/>
+        <click selector="{{StorefrontMinicartSection.showCart}}" stepKey="openMiniCart"/>
+        <waitForElementVisible selector="{{StorefrontMinicartSection.viewAndEditCart}}" stepKey="waitViewAndEditCartToBeVisible"/>
+        <!--Assert product name in the Mini Cart-->
+        <comment userInput="Assert product name in the Mini Cart" stepKey="assertProdName7"/>
+        <grabTextFrom selector="{{StorefrontMinicartSection.productName}}"  stepKey="grabProductNameFromMiiCart"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromMiiCart" stepKey="assertProductNameFromMiiCart"/>
+        <!--Click 'View and Edit Cart'-->
+        <comment userInput="Click 'View and Edit Cart'" stepKey="clickViewAndEditCartButton"/>
+        <click selector="{{StorefrontMinicartSection.viewAndEditCart}}" stepKey="clickViewAndEditCart"/>
+        <waitForPageLoad stepKey="waitForMiniCartPage"/>
+        <!--Assert product name on the Shopping Cart page-->
+        <comment userInput="Assert product name on the Shopping Cart page" stepKey="assertProdName8"/>
+        <grabTextFrom selector="{{CheckoutCartProductSection.productName}}"  stepKey="grabProductNameFromShoppingCartPage"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromShoppingCartPage" stepKey="assertProductNameFromShoppingCartPage"/>
+        <!--Click 'Proceed to Checkout'-->
+        <comment userInput="Click 'Proceed to Checkout'" stepKey="goToCheckoutPage"/>
+        <click selector="{{CheckoutCartSummarySection.proceedToCheckout}}" stepKey="clickProceedToCheckout"/>
+        <waitForPageLoad stepKey="waitForCheckoutPage"/>
+        <!--Assert product name on the order summary block on checkout page-->
+        <comment userInput="Assert product name on the order summary block on checkout page" stepKey="assertProdName9"/>
+        <click selector="{{CheckoutOrderSummarySection.miniCartTab}}" stepKey="clickToOpenOrderSummaryBlock"/>
+        <waitForPageLoad stepKey="waitSummaryBlockToOpen"/>
+        <grabTextFrom selector="{{CheckoutOrderSummarySection.productItemName}}"  stepKey="grabProductNameFromOrderSummaryBlock"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromOrderSummaryBlock" stepKey="assertProductNameFromOrderSummaryBlock"/>
+        <!--Place Order-->
+        <comment userInput="Place Order" stepKey="placeOrder"/>
+        <click selector="{{CheckoutShippingMethodsSection.next}}" stepKey="clickNextButtun"/>
+        <click selector="{{CheckoutPaymentSection.placeOrder}}" stepKey="clickPlaceOrderButtun"/>
+        <!--Go to Admin Orders grid and open created Order-->
+        <comment userInput="Go to Admin Orders grid and open created Order" stepKey="openCreatedOrder"/>
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber22}}" stepKey="grabOrderNumber"/>
+        <amOnPage url="{{AdminOrdersPage.url}}" stepKey="onOrdersPage"/>
+        <actionGroup ref="filterOrderGridById" stepKey="filterOrderGridById">
+            <argument name="orderId" value="$grabOrderNumber"/>
+        </actionGroup>
+        <click selector="{{AdminOrdersGridSection.firstRow}}" stepKey="openOrderPage"/>
+        <!--Assert product name and sku in Items Ordered grid -->
+        <comment userInput="Assert product name and sku in Items Ordered grid" stepKey="assertProdNameAndSKU1"/>
+        <grabTextFrom selector="{{AdminOrderItemsOrderedSection.productNameColumn}}"  stepKey="grabProductNameFromItemsOrderedSection"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromItemsOrderedSection" stepKey="assertProductNameFromItemsOrderedSection"/>
+        <grabTextFrom selector="{{AdminOrderItemsOrderedSection.itemProductSku('1')}}"  stepKey="grabProductSKUFromItemsOrderedSection2"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKUFromItemsOrderedSection2" stepKey="assertProductSKUFromItemsOrderedSection2"/>
+        <!--Create Invoice for the Order-->
+        <comment userInput="Create Invoice for the Order" stepKey="createInvoiceForTheOrder"/>
+        <click selector="{{AdminOrderDetailsMainActionsSection.invoice}}" stepKey="clickOnInvoiceBtn"/>
+        <waitForPageLoad stepKey="waitInvoiceMainSectionToLoad"/>
+        <click selector="{{AdminInvoiceMainActionsSection.submitInvoice}}" stepKey="clickSubmitInvoice"/>
+        <waitForPageLoad stepKey="waitForInvoiceSubmitDone"/>
+        <!--Filter Invoices to find last created-->
+        <comment userInput="Filter Invoices to find last created" stepKey="filterInvoiceGrid"/>
+        <actionGroup ref="filterInvoiceGridByOrderId" stepKey="filterInvoiceGridByOrderId">
+            <argument name="orderId" value="$grabOrderNumber"/>
+        </actionGroup>
+        <!--Open created Invoice-->
+        <comment userInput="Open created Invoice" stepKey="openInvoice"/>
+        <click selector="{{AdminInvoicesGridSection.firstRow}}" stepKey="opeCreatedInvoice"/>
+        <waitForPageLoad stepKey="waitForInvoiceDetailsPageToLoad"/>
+        <!--Assert product name and sku in the Invoice -->
+        <comment userInput="Assert product name and sku in the Invoice" stepKey="assertProdNameAndSKU2"/>
+        <grabTextFrom selector="{{AdminInvoiceItemsSection.nameColumn}}"  stepKey="grabProductNameFromItemsInvoiced"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromItemsInvoiced" stepKey="assertProductNameFromItemsInvoiced"/>
+        <grabTextFrom selector="{{AdminInvoiceItemsSection.nameColumn}}"  stepKey="grabProductSKUFromInvoiceItemsSection"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKUFromInvoiceItemsSection" stepKey="assertProductSKUFromInvoiceItemsSection"/>
+        <!--Create Shipment for the order-->
+        <comment userInput="Create Shipment for the order" stepKey="createShipment"/>
+        <actionGroup ref="filterOrderGridById" stepKey="filterOrderGridById2">
+            <argument name="orderId" value="$grabOrderNumber"/>
+        </actionGroup>
+        <click selector="{{AdminOrdersGridSection.firstRow}}" stepKey="openOrderPage2"/>
+        <waitForPageLoad stepKey="waitForOrderDetailsPage"/>
+        <click selector="{{AdminOrderDetailsMainActionsSection.ship}}" stepKey="clickShipAction"/>
+        <seeInCurrentUrl url="{{AdminShipmentNewPage.url}}" stepKey="seeOrderShipmentUrl"/>
+        <!--Submit Shipment-->
+        <comment userInput="Submit Shipment" stepKey="submitShipment"/>
+        <click selector="{{AdminShipmentMainActionsSection.submitShipment}}" stepKey="clickSubmitShipment"/>
+        <waitForPageLoad stepKey="waitForShipmentSubmit"/>
+        <!--Open created shipment-->
+        <comment userInput="Open created shipment" stepKey="openShipment"/>
+        <click selector="{{AdminOrderDetailsOrderViewSection.shipments}}" stepKey="clickOrderShipmentsTab"/>
+        <waitForLoadingMaskToDisappear stepKey="waitForShipmentTabLoad" after="clickOrderShipmentsTab"/>
+        <click selector="{{AdminOrderShipmentsTabSection.viewGridRow('1')}}" stepKey="clickRowToViewShipment"/>
+        <waitForPageLoad stepKey="waitForShipmentItemsSection"/>
+        <!--Assert product name and sku in the Shipment-->
+        <comment userInput="Assert product name and sku in the Shipment" stepKey="assertProdNameAndSKU3"/>
+        <grabTextFrom selector="{{AdminShipmentItemsSection.itemName('1')}}"  stepKey="grabProductNameFromShipment"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromShipment" stepKey="assertProductNameFromShipment"/>
+        <grabTextFrom selector="{{AdminShipmentItemsSection.itemSku('1')}}"  stepKey="grabProductSKUFromShipmentItemsSection2"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKUFromShipmentItemsSection2" stepKey="assertProductSKUFromShipmentItemsSection"/>
+        <!--Create Credit Memo-->
+        <comment userInput="Create Credit Memo" stepKey="createCreditMemo"/>
+        <actionGroup ref="filterOrderGridById" stepKey="filterOrderGridById3">
+            <argument name="orderId" value="$grabOrderNumber"/>
+        </actionGroup>
+        <click selector="{{AdminOrdersGridSection.firstRow}}" stepKey="openOrderPage3"/>
+        <waitForPageLoad stepKey="waitForOrderDetailsPage2"/>
+        <click selector="{{AdminOrderDetailsMainActionsSection.creditMemo}}" stepKey="clickCreditMemoAction"/>
+        <fillField selector="{{AdminCreditMemoTotalSection.refundShipping}}" userInput="0" stepKey="setRefundShipping"/>
+        <see selector="{{AdminHeaderSection.pageTitle}}" userInput="New Memo" stepKey="seeNewMemoInPageTitle"/>
+        <click selector="{{AdminCreditMemoTotalSection.submitRefundOffline}}" stepKey="clickRefundOffline"/>
+        <!--Open Created Memo-->
+        <comment userInput="Open Created Memo" stepKey="clickOnCreatedMemo"/>
+        <click selector="{{AdminCreditMemoTotalSection.creditMemoItem}}" stepKey="goToCreatedCreditMemo"/>
+        <waitForPageLoad stepKey="waitForPageLoad6"/>
+        <click selector="{{AdminCreditMemoTotalSection.viewMemo}}" stepKey="openCreatedMemo"/>
+        <waitForPageLoad stepKey="waitForMemoTotalSectionLoad"/>
+        <!--Assert product name and sku in the Shipment-->
+        <comment userInput="Assert product name and sku in the Shipment" stepKey="assertProdNameAndSKU4"/>
+        <grabTextFrom selector="{{AdminCreditMemoItemsSection.itemName('1')}}"  stepKey="grabProductNameFromMemo"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromMemo" stepKey="assertProductNameFromMemo"/>
+        <grabTextFrom selector="{{AdminCreditMemoItemsSection.itemSku('1')}}"  stepKey="grabProductSKUFromMemoItemsSection"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKUFromMemoItemsSection" stepKey="assertProductSKUFromMemoItemsSection"/>
+        <!--Create Returns for the Order-->
+        <comment userInput="Create Returns for the Order" stepKey="createReturnsForOrder"/>
+        <actionGroup ref="filterOrderGridById" stepKey="filterOrderGridById4">
+            <argument name="orderId" value="$grabOrderNumber"/>
+        </actionGroup>
+        <click selector="{{AdminOrdersGridSection.firstRow}}" stepKey="openOrderPage4"/>
+        <waitForPageLoad stepKey="waitForOrderDetailsPage4"/>
+        <actionGroup ref="createReturns" stepKey="createReturns">
+            <argument name="customer" value="$$createCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="goToReturnItemsTab" stepKey="goToReturnItemsTab"/>
+        <waitForPageLoad stepKey="waitForReturnItemsPageLoad"/>
+        <actionGroup ref="addReturnItem" stepKey="addReturnItem">
+            <argument name="product" value="$$product$$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForReturnItemsAdd"/>
+        <actionGroup ref="submitReturnItem" stepKey="submitReturnItem"/>
+        <waitForPageLoad stepKey="waitForReturnItemsSubmitLoad"/>
+        <!--Go to Admin -> Sales -> Returns-->
+        <comment userInput="Go to Admin -> Sales -> Returns" stepKey="goToReturns"/>
+        <amOnPage stepKey="goToReturnPage" url="{{AdminReturnsPage.url}}"/>
+        <waitForPageLoad stepKey="waitForReturnsPageLoad"/>
+        <!--Open new created return-->
+        <comment userInput="Open new created return" stepKey="openReturns"/>
+        <click selector="{{AdminReturnGridFilterSection.resetFilter}}" stepKey="clearExistingRmaFilters" after="waitForReturnsPageLoad"/>
+        <waitForPageLoad stepKey="waitForFilterReset"/>
+        <fillField selector="{{AdminReturnGridFilterSection.orderIdFilter}}" userInput="$grabOrderNumber" stepKey="fillOrderIdRmaFilter" after="clearExistingRmaFilters"/>
+        <click selector="{{AdminReturnGridSection.rowViewAction('1')}}" stepKey="clickViewReturnFromGrid"/>
+        <waitForPageLoad stepKey="waitForReturnTicketPageOpened"/>
+        <click selector="{{AdminReturnInformationSection.returnItems}}" stepKey="clickReturnItems"/>
+        <waitForPageLoad stepKey="waitForReturnItemsLoad"/>
+        <!--Assert product name and sku in the Shipment-->
+        <comment userInput="Assert product name and sku in the Shipment" stepKey="assertProdAndSKU4"/>
+        <grabTextFrom selector="{{AdminReturnItemsTabSection.productName('1')}}"  stepKey="grabProductNameFromReturn"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromReturn" stepKey="assertProductNameFromReturn"/>
+        <grabTextFrom selector="{{AdminReturnItemsTabSection.productSku('1')}}"  stepKey="grabProductSKUFromReturnItemsSection"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKUFromReturnItemsSection" stepKey="assertProductSKUFromReturnItemsSection"/>
+        <!--Go to created category page and click on the category from preconditions-->
+        <comment userInput="Go to created category page and click on the category from preconditions" stepKey="goToAdminCategoryPage"/>
+        <amOnPage url="{{AdminCategoryPage.url}}" stepKey="goToCategoriesPage"/>
+        <waitForPageLoad stepKey="waitForCategoryPageLoad"/>
+        <click selector="{{AdminCategorySidebarTreeSection.categoryInTree($$category.name$$)}}" stepKey="clickOnCreatedCategory"/>
+        <waitForPageLoad stepKey="waitForCategorySectionLoad"/>
+        <!--Expand 'Products in Category' section-->
+        <comment userInput="Expand 'Products in Category' section" stepKey="expandProdsInCategorySection"/>
+        <scrollTo selector="{{AdminCategoryBasicFieldSection.productsInCategory}}" x="0" y="-80" stepKey="scrollToProductInCategory"/>
+        <click selector="{{AdminCategoryBasicFieldSection.productsInCategory}}" stepKey="clickOnProductInCategory"/>
+        <!--Assert product name and sku-->
+        <comment userInput="Assert product name and sku" stepKey="assertProdNameAndSKU5"/>
+        <grabTextFrom selector="{{AdminCategoryProductsGridSection.nameColumn}}"  stepKey="grabProductNameFromCategory"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}" actual="$grabProductNameFromCategory" stepKey="assertProductNameFromCategory"/>
+        <grabTextFrom selector="{{AdminCategoryProductsGridSection.skuColumn}}"  stepKey="grabProductSKUFromCategoryProductsGridSection"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKUFromCategoryProductsGridSection" stepKey="assertProductSKUFromCategoryProductsGridSection"/>
+        <!--Click 'Add Products' button-->
+        <comment userInput="Click 'Add Products' button" stepKey="clickAddProductsButton"/>
+        <click selector="{{AdminCategoryProductsSection.addProducts}}" stepKey="clickAddProducts"/>
+        <waitForPageLoad stepKey="waitForPopupLoad"/>
+        <actionGroup ref="filterProductGridBySku" stepKey="filterProductGridBySku2">
+            <argument name="product" value="$$product$$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForFilterComplete"/>
+        <!--Assert product name and sku-->
+        <comment userInput="Assert product name and sku" stepKey="assertProdNameAndSKU6"/>
+        <grabTextFrom selector="{{AdminCategoryProductsSection.productNameInAddProductsPopup}}"  stepKey="grabProductName3"/>
+        <assertEquals expected="{{prodNameWithSpecChars.trademark}}"  actual="($grabProductName3)" stepKey="assertProdName10"/>
+        <grabTextFrom selector="{{AdminCategoryProductsSection.productSKUInAddProductsPopup}}"  stepKey="grabProductSKU3"/>
+        <assertContains expected="{{prodNameWithSpecChars.skumark}}" actual="$grabProductSKU3" stepKey="assertProductSKU3"/>
+    </test>
+</tests>

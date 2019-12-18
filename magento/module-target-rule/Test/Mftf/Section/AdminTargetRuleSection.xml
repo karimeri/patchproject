@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminTargetRuleSection">
+        <element name="successMessage" type="text" selector=".message.message-success.success"/>
+        <element name="addRule" type="button" selector="#add" timeout="30"/>
+        <element name="header" type="text" selector="h1.page-title"/>
+        <element name="back" type="button" selector="#back" timeout="30"/>
+        <element name="reset" type="button" selector="#reset" timeout="30"/>
+        <element name="save" type="button" selector="#save" timeout="30"/>
+        <element name="saveAndEdit" type="button" selector="#save_and_continue_edit" timeout="30"/>
+        <element name="ruleInformationTab" type="button" selector="#targetrule_tabs_magento_targetrule_edit_tab_main" timeout="30"/>
+        <element name="productToMatchTab" type="button" selector="#targetrule_tabs_magento_targetrule_edit_tab_conditions" timeout="30"/>
+        <element name="productToDisplayTab" type="button" selector="#targetrule_tabs_magento_targetrule_edit_tab_actions" timeout="30"/>
+    </section>
+
+    <section name="AdminTargetRuleInformationSection">
+        <element name="ruleName" type="input" selector="#rule_name"/>
+        <element name="priority" type="input" selector="#rule_sort_order"/>
+        <element name="status" type="select" selector="#rule_is_active"/>
+        <element name="applyTo" type="select" selector="#rule_apply_to"/>
+        <element name="from" type="input" selector="#rule_from_date"/>
+        <element name="to" type="input" selector="#rule_to_date"/>
+        <element name="resultLimit" type="input" selector="#rule_positions_limit"/>
+        <element name="customerSegments" type="select" selector="#rule_use_customer_segment"/>
+    </section>
+
+    <section name="AdminTargetRuleProductsToMatchSection">
+        <element name="selectButton" type="button" selector="//*[@id='rule_conditions_fieldset']/span[{{value}}]/a" parameterized="true" timeout="30"/>
+        <element name="selectCondition" type="button" selector="//*[@id='conditions__1__children']/li[{{value1}}]/span[{{value2}}]/a" parameterized="true" timeout="30"/>
+        <element name="conditionAggregator" type="select" selector="#conditions__1__aggregator" timeout="30"/>
+        <element name="conditionValue" type="select" selector="#conditions__1__value" timeout="30"/>
+        <element name="newCondition" type="select" selector="#conditions__1__new_child" timeout="30"/>
+        <element name="newConditionOperator" type="select" selector="#conditions__1--1__operator" timeout="30"/>
+        <element name="newConditionValue" type="select" selector="#conditions__1--1__value" timeout="30"/>
+    </section>
+
+    <section name="AdminTargetRuleProductsToDisplaySection">
+        <element name="selectButton" type="button" selector="//*[@id='rule_actions_fieldset']/span[{{value}}]/a" parameterized="true" timeout="30"/>
+        <element name="selectCondition" type="button" selector="//*[@id='actions__1__children']/li[{{value1}}]/span[{{value2}}]/a" parameterized="true" timeout="30"/>
+        <element name="actionAggregator" type="select" selector="#actions__1__aggregator" timeout="30"/>
+        <element name="actionValue" type="select" selector="#actions__1__value" timeout="30"/>
+        <element name="newAction" type="select" selector="#actions__1__new_child" timeout="30"/>
+        <element name="newActionOperator" type="select" selector="#actions__1--1__operator" timeout="30"/>
+    </section>
+</sections>

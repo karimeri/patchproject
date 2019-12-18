@@ -1,0 +1,1053 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="ValidatePanelContentTypesGroupedCorrectly">
+        <seeElement selector="{{PageBuilderPanel.contentTypeInMenuSection('4', 'Add Content', '2', 'Dynamic Block')}}" stepKey="validateContentTypeDynamicBlock" after="validateContentTypeBlock"/>
+        <seeElement selector="{{PageBuilderPanel.contentTypeInMenuSection('4', 'Add Content', '3', 'Products')}}" stepKey="validateContentTypeProducts"/>
+    </test>
+    <test name="PageBuilderDynamicBlockUseDefaultValueCheckBoxWithPageBuilder">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Dynamic Block use default value checkbox disabled PageBuilder on different store view"/>
+            <description value="Verify that use default value checkbox disables pagebuilder on different store views"/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-5222"/>
+            <useCaseId value="MC-5107"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+        </annotations>
+        <before>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedDynamicBlock">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+        </before>
+        <after>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <!-- Change scope -->
+        <comment userInput="Change scope" stepKey="commentChangeScope"/>
+        <click selector="{{AdminBannerBasicActionSection.Scope}}" stepKey="clickScopeSelector"/>
+        <waitForPageLoad stepKey="waitForScope"/>
+        <waitForElementVisible selector="{{AdminBannerBasicActionSection.ScopeDropdown}}" stepKey="waitForScopeDropdownVisible"/>
+        <waitForPageLoad stepKey="waitForScopeDropdown"/>
+        <click selector="{{AdminBannerBasicActionSection.ScopeOption('Default Store View')}}" stepKey="selectScope"/>
+        <waitForPageLoad stepKey="waitForScopeOptionChange"/>
+        <waitForElementVisible selector="{{AdminBannerBasicActionSection.ScopeModal}}" stepKey="waitForScopeModal"/>
+        <click selector="{{AdminBannerBasicActionSection.ScopeModalConfirm}}" stepKey="confirmScopeModal"/>
+        <waitForPageLoad stepKey="waitForScopeModalConfirm"/>
+        <seeElement selector="{{PageBuilderStage.disabled}}" stepKey="seeDisabledPageBuilder"/>
+        <!-- Verify disabled PageBuilder -->
+        <comment userInput="Verify disabled PageBuilder" stepKey="commentVerifyDisabledPageBuilder"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.disabled}}&quot;, document.body).iterateNext())['pointer-events']" stepKey="getPointerEvents"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.disabled}}&quot;, document.body).iterateNext())['opacity']" stepKey="getOpacity"/>
+        <assertEquals stepKey="assertPointerEventsValue">
+            <expectedResult type="string">none</expectedResult>
+            <actualResult type="variable">getPointerEvents</actualResult>
+        </assertEquals>
+        <assertEquals stepKey="assertOpacityValue">
+            <expectedResult type="string">0.5</expectedResult>
+            <actualResult type="variable">getOpacity</actualResult>
+        </assertEquals>
+        <!-- Verify enabled PageBuilder -->
+        <comment userInput="Verify enabled PageBuilder" stepKey="commentVerifyEnabledPageBuilder"/>
+        <click selector="{{BannerContentSection.UseDefaultValue}}" stepKey="checkDefaultValueCheckbox"/>
+        <waitForPageLoad stepKey="waitForPageBuilderEnabling"/>
+        <seeElement selector="{{PageBuilderStage.enabled}}" stepKey="seeEnabledPageBuilder"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.enabled}}&quot;, document.body).iterateNext())['pointer-events']" stepKey="getPointerEvents2"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.enabled}}&quot;, document.body).iterateNext())['opacity']" stepKey="getOpacity2"/>
+        <assertEquals stepKey="assertPointerEventsValue2">
+            <expectedResult type="string">auto</expectedResult>
+            <actualResult type="variable">getPointerEvents2</actualResult>
+        </assertEquals>
+        <assertEquals stepKey="assertOpacityValue2">
+            <expectedResult type="string">1</expectedResult>
+            <actualResult type="variable">getOpacity2</actualResult>
+        </assertEquals>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandPageBuilderPanelMenuSection">
+            <argument name="contentType" value="PageBuilderTextContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragButtonsOntoStage">
+            <argument name="contentType" value="PageBuilderTextContentType"/>
+        </actionGroup>
+        <!-- Check disable PageBuilder again -->
+        <comment userInput="Check disable PageBuilder again" stepKey="commentDisablePageBuilder"/>
+        <click selector="{{BannerContentSection.UseDefaultValue}}" stepKey="clickDefaultValueCheckbox2"/>
+        <waitForPageLoad stepKey="waitForFieldControlChange"/>
+        <waitForElementNotVisible selector="{{PageBuilderStage.enabled}}" stepKey="waitForNotEnabledPageBuilder"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveDynamicBlock"/>
+        <seeElement selector="{{PageBuilderStage.disabled}}" stepKey="seeDisabledPageBuilder2"/>
+        <!-- Verify disabled PageBuilder after save-->
+        <comment userInput="Verify disabled PageBuilder after save" stepKey="commentVerifyDisabledPageBuilderAfterSave"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.disabled}}&quot;, document.body).iterateNext())['pointer-events']" stepKey="getPointerEventsAfterSave"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.disabled}}&quot;, document.body).iterateNext())['opacity']" stepKey="getOpacityAfterSave"/>
+        <assertEquals stepKey="assertPointerEventsValueAfterSave">
+            <expectedResult type="string">none</expectedResult>
+            <actualResult type="variable">getPointerEventsAfterSave</actualResult>
+        </assertEquals>
+        <assertEquals stepKey="assertOpacityValueAfterSave">
+            <expectedResult type="string">0.5</expectedResult>
+            <actualResult type="variable">getOpacityAfterSave</actualResult>
+        </assertEquals>
+        <!-- Verify re-enabling PageBuilder after save-->
+        <comment userInput="Verify re-enabling PageBuilder after save" stepKey="commentVerifyReEnablingPageBuilderAfterSave"/>
+        <click selector="{{BannerContentSection.UseDefaultValue}}" stepKey="uncheckDefaultValueCheckbox"/>
+        <waitForPageLoad stepKey="waitForPageBuilderReEnablingAfterSave"/>
+        <seeElement selector="{{PageBuilderStage.enabled}}" stepKey="seeReEnabledPageBuilderAfterSave"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.enabled}}&quot;, document.body).iterateNext())['pointer-events']" stepKey="getPointerReEnablingEventsAfterSave"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.enabled}}&quot;, document.body).iterateNext())['opacity']" stepKey="getOpacityReEnablingAfterSave"/>
+        <assertEquals stepKey="assertPointerReEnablingEventsValueAfterSave">
+            <expectedResult type="string">auto</expectedResult>
+            <actualResult type="variable">getPointerReEnablingEventsAfterSave</actualResult>
+        </assertEquals>
+        <assertEquals stepKey="assertOpacityReEnablingValueAfterSave">
+            <expectedResult type="string">1</expectedResult>
+            <actualResult type="variable">getOpacityReEnablingAfterSave</actualResult>
+        </assertEquals>
+        <!-- Verify re-disabling PageBuilder after save-->
+        <comment userInput="Verify re-disabled PageBuilder after save" stepKey="commentVerifyReDisabledPageBuilderAfterSave"/>
+        <click selector="{{BannerContentSection.UseDefaultValue}}" stepKey="checkDefaultValueCheckbox2"/>
+        <waitForPageLoad stepKey="waitForBannerReDisabledAfterSave"/>
+        <seeElement selector="{{PageBuilderStage.disabled}}" stepKey="seeReDisabledPageBuilderAfterSave"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.disabled}}&quot;, document.body).iterateNext())['pointer-events']" stepKey="getPointerReDisabledEventsAfterSave"/>
+        <executeJS function="return window.getComputedStyle(document.evaluate(&quot;{{PageBuilderStage.disabled}}&quot;, document.body).iterateNext())['opacity']" stepKey="getOpacityReDisabledAfterSave"/>
+        <assertEquals stepKey="assertPointerReDisabledEventsValueAfterSave">
+            <expectedResult type="string">none</expectedResult>
+            <actualResult type="variable">getPointerReDisabledEventsAfterSave</actualResult>
+        </assertEquals>
+        <assertEquals stepKey="assertOpacityReDisabledValueAfterSave">
+            <expectedResult type="string">0.5</expectedResult>
+            <actualResult type="variable">getOpacityReDisabledAfterSave</actualResult>
+        </assertEquals>
+    </test>
+    <test name="PageBuilderDynamicBlockAddAndEditRowColumnSlide" extends="PageBuilderCatalogProductAddAndEditRowColumnSlide">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Add and Edit Row, Column, and Slider to PageBuilder in Dynamic Block"/>
+            <description value="This test is intended to ensure that basic adding and editing of multiple content types work correctly in the Dynamic Block area of PageBuilder."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15095"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-row"/>
+            <group value="pagebuilder-column"/>
+            <group value="pagebuilder-slide"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="seeBackgroundColorSlide2StageAfterSave"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragDynamicBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragDynamicBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <!-- Validate CMS Page Stage -->
+        <comment userInput="Validate CMS Page Stage" stepKey="commentValidateCMSPageStage" after="saveEditPanelSettings"/>
+        <seeNumberOfElements selector="{{RowOnStorefront.allRows}}" userInput="3" stepKey="see3RowsCMSPageStage" after="commentValidateCMSPageStage"/>
+        <seeElement selector="{{RowOnStorefront.backgroundColor('3', PageBuilderBackgroundColor_Hex_Grey.rgb)}}" stepKey="seeBackgroundColorRowCMSPageStage" after="see3RowsCMSPageStage"/>
+        <seeNumberOfElements selector="{{ColumnOnFrontend.allColumns}}" userInput="2" stepKey="see2ColumnsCMSPageStage" after="seeBackgroundColorRowCMSPageStage"/>
+        <seeElement selector="{{ColumnOnFrontend.backgroundColor('2', PageBuilderBackgroundColor_Hex_White.rgb)}}" stepKey="seeBackgroundColorColumnCMSPageStage" after="see2ColumnsCMSPageStage"/>
+        <seeElement selector="{{SlideOnFrontend.backgroundColor('2', PageBuilderBackgroundColor_Plaintext_Green.rgb)}}" stepKey="seeBackgroundColorSlide1CMSPageStage" after="seeBackgroundColorColumnCMSPageStage"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="seeBackgroundColorSlide1CMSPageStage"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+        <seeNumberOfElements selector="{{RowOnStorefront.allRows}}" userInput="3" stepKey="see2RowsStorefront"/>
+        <seeElement selector="{{RowOnStorefront.backgroundColor('3', PageBuilderBackgroundColor_Hex_Grey.rgb)}}" stepKey="seeBackgroundColorRowStorefront"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanMoveContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanMoveContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can move content types from on-hover option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can move content types from the on-hover option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15123"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-column"/>
+            <group value="pagebuilder-heading"/>
+            <group value="pagebuilder-divider"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="validateDividerPositionAfterSave"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragDynamicBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragDynamicBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanEditContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanEditContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can move content types from on-hover option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can move content types from the on-hover option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15124"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-row"/>
+            <group value="pagebuilder-edit"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="seeBackgroundColorOnEditPanel"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragDynamicBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragDynamicBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+        <seeElement selector="{{RowOnStorefront.backgroundColor('2', PageBuilderBackgroundColor_Hex_Grey.rgb)}}" stepKey="seeBackgroundColorRowStorefront"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanDuplicateContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanDuplicateContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can duplicate content types from on-hover option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can duplicate content types from the on-hover option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15137"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-row"/>
+            <group value="pagebuilder-duplicate"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="closeEditPanel"/>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="seeBackgroundColorRow2StageAfterSave"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragDynamicBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragDynamicBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+        <seeNumberOfElements selector="{{RowOnStorefront.allRows}}" userInput="3" stepKey="see2RowsStorefront"/>
+        <seeElement selector="{{RowOnStorefront.backgroundColor('2', PageBuilderBackgroundColor_Hex_Grey.rgb)}}" stepKey="seeBackgroundColorRow1Storefront"/>
+        <seeElement selector="{{RowOnStorefront.backgroundColor('3', PageBuilderBackgroundColor_Hex_Grey.rgb)}}" stepKey="seeBackgroundColorRow2Storefront"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanDeleteContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanDeleteContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can delete content types from on-hover option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can delete content types from the on-hover option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15151"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-divider"/>
+            <group value="pagebuilder-delete"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreenAfterDelete"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProductAfterDelete"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSectionAfterDelete"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescriptionAfterDelete"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="dontSeeDividerInStageAfterSave"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanAddChildContentTypesFromOnHoverOptionMenus" extends="PageBuilderCatalogProductVerifyCanAddChildContentTypesFromOnHoverOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can add child content types from on-hover option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can add child content types from the on-hover option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15152"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-add"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="see2ButtonItemsStageAfterSave"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanEditContentTypesFromOnClickOptionMenus" extends="PageBuilderCatalogProductVerifyCanEditContentTypesFromOnClickOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can edit content types from on-click option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can edit content types from the on-click option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15154"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-slide"/>
+            <group value="pagebuilder-edit"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="seeBackgroundColorOnEditPanel"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanDuplicateContentTypesFromOnClickOptionMenus" extends="PageBuilderCatalogProductVerifyCanDuplicateContentTypesFromOnClickOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can duplicate content types from on-click option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can duplicate content types from the on-click option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15155"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-duplicate"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="closeEditPanel"/>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="closeEditPanel"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanDeleteContentTypesFromOnClickOptionMenus" extends="PageBuilderCatalogProductVerifyCanDeleteContentTypesFromOnClickOptionMenus">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can delete content types from on-click option menus in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can delete content types from the on-click option menus within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15156"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-delete"/>
+        </annotations>
+        <before>
+            <comment userInput="---merging to remove step---" stepKey="createPreReqCategory"/>
+            <comment userInput="---merging to remove step---" stepKey="createProduct"/>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToCreatedProductEditPage">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="expandAdminProductSection">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="openPageBuilderForDescription"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCreatedProduct"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteCreatedCategory">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="NavigateToAndResetProductGridToDefaultView"/>
+        </after>
+        <comment userInput="Save Dynamic Block" stepKey="commentSaveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreen"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProduct"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSection"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescription"/>
+        <comment userInput="---merging to remove step---" stepKey="exitPageBuilderFullScreenAfterDelete"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveProductAfterDelete"/>
+        <comment userInput="---merging to remove step---" stepKey="expandAdminProductSectionAfterDelete"/>
+        <comment userInput="---merging to remove step---" stepKey="openPageBuilderForDescriptionAfterDelete"/>
+        <!-- Go to CMS Page and choose Block -->
+        <comment userInput="Go to CMS Page and choose Block" stepKey="commentGoToCMSPage" after="see1ButtonItemStageAfterSave"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStage" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettings" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPage" after="saveEditPanelSettings"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToProductStorefront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+        <comment userInput="---merging to remove step---" stepKey="scrollToProductDescription"/>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanMoveButtonItems" extends="ButtonItemMoveButtonStackedAppearance">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can move Button Items in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can move Button Items within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15157"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="removeHTMLContentType" before="switchToPageBuilderStage">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage" before="deleteDynamicBlock"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock" before="logout">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="saveEditPanelSettings1"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveAndContinueEditCmsPage"/>
+        <comment userInput="---merging to remove step---" stepKey="switchToPageBuilderStage"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="seeAppearanceOnStageSecondButtons2"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStageAfterBlock" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStageAfterBlock">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettingsAfterBlock" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPageAfterBlock" after="saveEditPanelSettingsAfterBlock"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToStoreFront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanMoveSlideItems" extends="SlideItemMoveSlideItemsToRearrange">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can move Slide Items in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can move Slide Items within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15161"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-slide"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="removeHTMLContentType" before="switchToPageBuilderStage">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage" before="deleteDynamicBlock"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock" before="logout">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="saveEditPanel1Settings"/>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="saveEditPanel1Settings2"/>
+        <actionGroup ref="saveEditPanelSettingsFullScreen" stepKey="saveEditPanel1Settings3"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveAndContinueEditCmsPage"/>
+        <comment userInput="---merging to remove step---" stepKey="switchToPageBuilderStage1"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveAndContinueEditCmsPage1"/>
+        <comment userInput="---merging to remove step---" stepKey="switchToPageBuilderStage2"/>
+        <!-- Go to CMS Page and choose Block -->
+        <comment userInput="Go to CMS Page and choose Block" stepKey="commentGoToCMSPage" after="seeSlideContentAfterSave2"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStageAfterBlock" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStageAfterBlock">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettingsAfterBlock" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPageAfterBlock" after="saveEditPanelSettingsAfterBlock"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToStoreFront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+    </test>
+    <test name="PageBuilderDynamicBlockVerifyCanMoveTabItems" extends="TabsRearrangeTabItems">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that user can move Tab Items in Dynamic Block"/>
+            <description value="This test is intended to ensure that users can move Tab Items within the PageBuilder stage for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15164"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-tab"/>
+            <group value="pagebuilder-move"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="removeHTMLContentType" before="switchToPageBuilderStage">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage" before="deleteDynamicBlock"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock" before="logout">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveAndContinueEditCmsPage"/>
+        <comment userInput="---merging to remove step---" stepKey="switchToPageBuilderStage"/>
+        <!-- Go to CMS Page and choose Dynamic Block -->
+        <comment userInput="Go to CMS Page and choose Dynamic Block" stepKey="commentGoToCMSPage" after="seeTab2NameStageAfterSave"/>
+        <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage" after="commentGoToCMSPage">
+            <argument name="CMSPage" value="$$createCMSPage$$"/>
+        </actionGroup>
+        <actionGroup ref="switchToPageBuilderStage" stepKey="switchToPageBuilderStageAfterBlock" after="navigateToCreatedCMSPage"/>
+        <actionGroup ref="expandPageBuilderPanelMenuSection" stepKey="expandMenuSectionAddContent" after="switchToPageBuilderStageAfterBlock">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="dragContentTypeToStage" stepKey="dragBlockIntoStage" after="expandMenuSectionAddContent">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditAfterDrop" after="dragBlockIntoStage">
+            <argument name="contentType" value="PageBuilderDynamicBlockContentType"/>
+        </actionGroup>
+        <actionGroup ref="searchAndSelectDynamicBlockInGrid" stepKey="searchAndSelectDynamicBlockInGrid" after="openEditAfterDrop">
+            <argument name="block" value="$$createDynamicBlock$$"/>
+        </actionGroup>
+        <actionGroup ref="saveEditPanelSettings" stepKey="saveEditPanelSettingsAfterBlock" after="searchAndSelectDynamicBlockInGrid"/>
+        <actionGroup ref="saveAndContinueEditCmsPage" stepKey="saveAndContinueEditCmsPageAfterBlock" after="saveEditPanelSettingsAfterBlock"/>
+        <!-- Validate CMS Page Storefront -->
+        <actionGroup ref="navigateToStorefrontForCreatedPage" stepKey="navigateToStoreFront">
+            <argument name="page" value="$$createCMSPage.identifier$$"/>
+        </actionGroup>
+    </test>
+    <test name="PageBuilderDynamicBlockFullScreenCoversEntireScreen" extends="PageBuilderFullScreenCoversEntireScreen">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Verify that full-screen mode covers entire screen in Dynamic Block"/>
+            <description value="This test is to ensure that the PageBuilder full-screen mode covers the entire screen when opened for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15165"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-fullScreen"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="removeHTMLContentType" before="switchToPageBuilderStage">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage" before="deleteDynamicBlock"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock" before="logout">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+        </after>
+    </test>
+    <test name="PageBuilderDynamicBlockFullScreenLeftPanelHeightAndFunctionality" extends="PageBuilderFullScreenLeftPanelHeightAndFunctionality">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Left panel is full-height and works in full-screen mode in Dynamic Block"/>
+            <description value="This test is to ensure that the PageBuilder left panel works and grows to span the full height of the viewport in full-screen mode when opened for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15166"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-fullScreen"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <comment userInput="---merging to remove step---" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage" before="deleteDynamicBlock"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock" before="logout">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+        </after>
+    </test>
+    <test name="PageBuilderDynamicBlockFullScreenCanAddAndEditContentTypes" extends="PageBuilderFullScreenCanAddAndEditContentTypes">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Dynamic Block"/>
+            <title value="Can add and edit content types in full-screen mode in Dynamic Block"/>
+            <description value="This test is to ensure that the user can successfully add and edit content types in full-screen mode when opened for Dynamic Block."/>
+            <severity value="CRITICAL"/>
+            <useCaseId value="MC-13782"/>
+            <testCaseId value="MC-15167"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-dynamic-block"/>
+            <group value="pagebuilder-buttons"/>
+            <group value="pagebuilder-fullScreen"/>
+        </annotations>
+        <before>
+            <createData entity="_emptyCmsPage" stepKey="createCMSPage" before="createDynamicBlock"/>
+            <createData entity="_defaultDynamicBlock" stepKey="createDynamicBlock" before="loginAsAdmin"/>
+            <actionGroup ref="navigateToCreatedDynamicBlock" stepKey="navigateToAPageWithPageBuilder">
+                <argument name="Banner" value="$$createDynamicBlock$$"/>
+            </actionGroup>
+            <actionGroup ref="removeContentTypeFromStageByIndex" stepKey="removeHTMLContentType" before="switchToPageBuilderStage">
+                <argument name="contentType" value="PageBuilderHtmlContentType"/>
+                <argument name="contentTypeNumber" value="1"/>
+            </actionGroup>
+            <actionGroup ref="confirmRemovalModal" stepKey="switchToPageBuilderStage"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCMSPage" stepKey="deleteCMSPage" before="deleteDynamicBlock"/>
+            <actionGroup ref="DeleteBannerActionGroup" stepKey="deleteDynamicBlock" before="logout">
+                <argument name="bannerName" value="$$createDynamicBlock.name$$"/>
+            </actionGroup>
+        </after>
+        <comment userInput="---merging to remove step---" stepKey="enterPageTitle"/>
+        <comment userInput="Save Dynamic Block" stepKey="commentSavePage"/>
+        <actionGroup ref="saveDynamicBlockForm" stepKey="saveAndContinueEditCmsPage"/>
+    </test>
+</tests>

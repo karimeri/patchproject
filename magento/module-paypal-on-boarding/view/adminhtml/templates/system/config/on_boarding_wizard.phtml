@@ -1,0 +1,41 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+/** @var \Magento\PaypalOnBoarding\Block\Adminhtml\System\Config\OnBoardingWizard $block */
+
+$button = $block->getButton();
+?>
+
+<?php if ($button->getLiveUrl() && $button->getSandboxUrl()) {?>
+    <script>
+        (function (d, s, id) {
+            var js, ref = d.getElementsByTagName(s)[0];
+            if (!d.getElementById(id)) {
+                js = d.createElement(s);
+                js.id = id;
+                js.async = true;
+                js.src = "https://www.paypal.com/webapps/merchantboarding/js/lib/lightbox/partner.js";
+                ref.parentNode.insertBefore(js, ref);
+            }
+        }(document, "script", "paypal-js"));
+    </script>
+    <div class="pp-buttons-container">
+        <div dir="ltr" style="text-align: left;" trbidi="on">
+            <a class="action-default paypal-connect"
+               data-paypal-button="true"
+               href="<?php echo $block->escapeUrl($button->getLiveUrl()) ?>"
+               target="PPFrame"
+               data-bind="i18n: 'Connect with PayPal'"></a>
+
+            <a class="action-default"
+               data-paypal-button="true"
+               href="<?php echo $block->escapeUrl($button->getSandboxUrl()); ?>"
+               target="PPFrame"
+               data-bind="i18n: 'Sandbox Credentials'"></a>
+        </div>
+    </div>
+<?php } ?>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="fillDynamicBlockName">
+        <arguments>
+            <argument name="Banner" defaultValue=""/>
+        </arguments>
+        <fillField selector="{{AdminBannerBasicActionSection.Name}}" userInput="{{Banner.Name}}" stepKey="fillBannerName" />
+        <conditionalClick selector="{{AdminBannerBasicActionSection.ContentTab}}" dependentSelector="{{BannerContentSection.checkIfContentTabOpen}}" stepKey="clickIfContentTabCloses" visible="true"/>
+    </actionGroup>
+
+    <actionGroup name="navigateToCreatedDynamicBlock">
+        <arguments>
+            <argument name="Banner"/>
+        </arguments>
+        <amOnPage url="{{AdminBannerGridPage.url}}" stepKey="navigateToDynamicBlocksGrid"/>
+        <waitForPageLoad stepKey="waitForPageLoad1"/>
+        <conditionalClick selector="//div[contains(@data-role, 'grid-wrapper')]/table/thead/tr/th/span[contains(text(), 'ID')]" dependentSelector="//span[contains(text(), 'ID')]/parent::th[not(contains(@class, '_descend'))]/parent::tr/parent::thead/parent::table/parent::div[contains(@data-role, 'grid-wrapper')]" stepKey="clickToAttemptSortByIdDescending" visible="true"/>
+        <waitForLoadingMaskToDisappear stepKey="waitForFirstIdSortDescendingToFinish" />
+        <!-- Conditional Click again in case it goes from default state to ascending on first click -->
+        <conditionalClick selector="//div[contains(@data-role, 'grid-wrapper')]/table/thead/tr/th/span[contains(text(), 'ID')]" dependentSelector="//span[contains(text(), 'ID')]/parent::th[not(contains(@class, '_descend'))]/parent::tr/parent::thead/parent::table/parent::div[contains(@data-role, 'grid-wrapper')]" stepKey="secondClickToAttemptSortByIdDescending" visible="true"/>
+        <waitForLoadingMaskToDisappear stepKey="waitForSecondIdSortDescendingToFinish" />
+        <click selector="{{AdminBannerGridSection.title(Banner.Name)}}" stepKey="clickSelectCreatedDynamicBlock" />
+        <waitForPageLoad stepKey="waitForPageLoad2"/>
+    </actionGroup>
+
+    <!--Fill and choose all elements-->
+    <actionGroup name="FillDynamicBlockActionGroup">
+        <arguments>
+            <argument name="bannerData" defaultValue="sampleBanner"/>
+            <argument name="customerSegmentName" type="string"/>
+        </arguments>
+        <fillField selector="{{AdminBannerBasicActionSection.Name}}" userInput="{{bannerData.Name}}" stepKey="fillBannerName" />
+        <!--Select block type-->
+        <click selector="{{AdminBannerBasicActionSection.type}}" stepKey="openDynamicBlockTypeList"/>
+        <click selector="{{AdminBannerBasicActionSection.OptionType(bannerData.Type)}}" stepKey="selectOptionType" />
+        <click selector="{{AdminBannerBasicActionSection.activeDoneButton}}" stepKey="clickDone" />
+        <!--Select customer segment-->
+        <click selector="{{SelectCustomerSegmentSection.CustomerSegmentDropdown}}" stepKey="openCustomerSegmentList"/>
+        <click selector="{{SelectCustomerSegmentSection.CustomerSegmentOption(customerSegmentName)}}" stepKey="selectCustomerSegmentOption" />
+        <click selector="{{AdminBannerBasicActionSection.activeDoneButton}}" stepKey="clickDoneBtn" />
+    </actionGroup>
+
+    <!--Insert image to dynamic block-->
+    <actionGroup name="InsertImageToDynamicBlockActionGroup">
+        <arguments>
+            <argument name="imageFileName" defaultValue="magento.jpg" type="string"/>
+        </arguments>
+        <!--Insert image-->
+        <conditionalClick selector="{{AdminBannerBasicActionSection.ContentTab}}" dependentSelector="{{BannerContentSection.checkIfContentTabOpen}}" stepKey="clickIfContentTabCloses" visible="true"/>
+        <click selector="{{AdminBannerBasicActionSection.insertImage}}" stepKey="clickInsertImage" />
+        <waitForElementVisible selector="{{MediaGallerySection.UploadImage}}" stepKey="waitAttacheButton"/>
+        <attachFile selector="{{MediaGallerySection.UploadImage}}" userInput="{{imageFileName}}" stepKey="attacheFile"/>
+        <waitForElementVisible selector="{{MediaGallerySection.imageBlockByName(imageFileName)}}" stepKey="waitImage"/>
+        <conditionalClick selector="{{MediaGallerySection.imageBlockByName(imageFileName)}}" dependentSelector="{{MediaGallerySection.imageSelected(imageFileName)}}" visible="false" stepKey="clickOnImage"/>
+        <click selector="{{MediaGallerySection.InsertFile}}" stepKey="clickSelectImage" />
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+    </actionGroup>
+
+    <actionGroup name="SaveAndContinueDynamicBlockActionGroup">
+        <click selector="{{AdminMainActionsSection.saveAndContinue}}" stepKey="clickSaveButton"/>
+        <see selector="{{AdminMessagesSection.success}}" userInput="You saved the dynamic block." stepKey="seeSuccessMessage"/>
+    </actionGroup>
+</actionGroups>

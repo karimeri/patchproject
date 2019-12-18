@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AssignToExistingUpdateActionGroup">
+        <arguments>
+            <argument name="staging"/>
+            <argument name="productPrice" defaultValue="10" type="string"/>
+        </arguments>
+        <waitForLoadingMaskToDisappear stepKey="waitForLoadingMaskToDisappear"/>
+        <conditionalClick selector="{{AdminStagingSlideOutSection.scheduleNewUpdateBtn}}" dependentSelector="{{AdminStagingSlideOutSection.updateName}}" visible="false" stepKey="conditionalClickNewUpdate"/>
+        <waitForPageLoad stepKey="waitForLoadNewUpdate"/>
+        <click selector="{{AdminAssignToExistingUpdateSection.assignToExistingUpdate}}" stepKey="selectAssignToExistingUpdate"/>
+        <seeElement selector="{{AdminAssignToExistingUpdateSection.assignSection}}" stepKey="seeSection"/>
+        <fillField selector="{{AdminAssignToExistingUpdateSection.searchStagingName}}" userInput="{{staging.updateName}}" stepKey="fillSearchStagingName"/>
+        <click selector="{{AdminAssignToExistingUpdateSection.submitSearch}}" stepKey="clickSubmitSearch"/>
+        <click selector="{{AdminAssignToExistingUpdateSection.selectAssignToExistingUpdate(staging.updateName)}}" stepKey="clickSelectAssignToExistingUpdate"/>
+        <fillField selector="{{AdminCatalogStagingSlideOutSection.productPrice}}" userInput="{{productPrice}}" stepKey="fillProductPrice"/>
+        <click selector="{{AdminStagingSlideOutSection.save}}" stepKey="clickSave"/>
+    </actionGroup>
+    <actionGroup name="AssignToExistingUpdateCheckActionGroup" extends="AssignToExistingUpdateActionGroup">
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(staging.updateName)}}" userInput="{{staging.updateName}}" stepKey="seeUpdateName"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(staging.updateDescription)}}" userInput="{{staging.updateDescription}}" stepKey="seeUpdateDescription"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleViewEdit(staging.updateName)}}" userInput="View/Edit" stepKey="seeUpdateViewAndEdit"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleActions(staging.updateName, 'Preview')}}" userInput="Preview" stepKey="seeUpdatePreview"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleLabel('Start')}}" userInput="Start" stepKey="seeStart"/>
+    </actionGroup>
+    <actionGroup name="AssignToExistingUpdateRemovePriceActionGroup" extends="AssignToExistingUpdateActionGroup">
+        <remove keyForRemoval="fillProductPrice"/>
+    </actionGroup>
+</actionGroups>

@@ -1,0 +1,56 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  _common contains core classes used throughout the PageBuilder admin
+//  ___________________________________________________________________
+
+.transition {
+    -o-transition: .5s;
+    -ms-transition: .5s;
+    -moz-transition: .5s;
+    -webkit-transition: .5s;
+    transition: .5s;
+}
+
+.clearfix:after {
+    clear: both;
+    content: ' ';
+    display: block;
+    font-size: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+//
+//  Commented Backslash Hack
+//  ---------------------------------------------
+
+.clearfix {
+    display: block;
+}
+
+
+* html .clearfix {
+    height: 1%;
+}
+
+//
+//  Responsive Classes
+//  _____________________________________________
+
+.pagebuilder-mobile-only {
+    display: none !important;
+}
+
+@media all and (max-width: @screen__m) {
+    .pagebuilder-mobile-only {
+        display: block !important;
+    }
+
+    .pagebuilder-mobile-hidden {
+        display: none !important;
+    }
+}

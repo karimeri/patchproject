@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+    <entity name="CustomerSegmentConditionsData" type="catalogRule">
+        <data key="condition">Number of Orders</data>
+        <data key="ordersNumber">0</data>
+        <data key="conditionType">ANY</data>
+    </entity>
+    <entity name="CustomerSegmentConditionsType">
+        <data key="newsletter">Magento\CustomerSegment\Model\Segment\Condition\Customer\Newsletter</data>
+    </entity>
+</entities>

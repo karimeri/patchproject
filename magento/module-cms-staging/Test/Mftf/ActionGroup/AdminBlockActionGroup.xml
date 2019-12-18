@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminCreateDisabledBlockActionGroup">
+        <arguments>
+            <argument name="block"/>
+        </arguments>
+        <amOnPage url="{{CmsNewBlock.url}}" stepKey="goCreateNewBlockPage"/>
+        <fillField selector="{{AdminCreateNewBlockSection.blockTitle}}" userInput="{{block.title}}" stepKey="fillTitle"/>
+        <fillField selector="{{AdminCreateNewBlockSection.identifier}}" userInput="{{block.identifier}}" stepKey="fillIdentifier"/>
+        <selectOption selector="{{AdminCreateNewBlockSection.storeView}}" userInput="{{block.store_id}}" stepKey="selectStoreView"/>
+        <fillField selector="{{AdminCreateNewBlockSection.content}}" userInput="{{block.content}}" stepKey="fillContent"/>
+        <scrollToTopOfPage stepKey="scrollToTopOfPage1"/>
+        <click selector="{{AdminCreateNewBlockSection.isEnabled}}" stepKey="disableBlock"/>
+        <click selector="{{AdminCreateNewBlockSection.save}}" stepKey="save"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <see userInput="You saved the block." stepKey="seeSuccessMessage"/>
+    </actionGroup>
+
+    <actionGroup name="AdminUpdateBlockActionGroup">
+        <arguments>
+            <argument name="block" type="string"/>
+        </arguments>
+        <amOnPage url="{{CmsBlocksPage.url}}" stepKey="goBlockPage"/>
+        <fillField selector="{{AdminBlockGridSection.search}}" userInput="{{block}}" stepKey="serachByTitle"/>
+        <click selector="{{AdminBlockGridSection.searchButton}}" stepKey="search"/>
+        <waitForAjaxLoad stepKey="waitForElementLoad" time="5"/>
+        <click selector="{{AdminBlockGridSection.select}}" stepKey="clickSelect"/>
+        <waitForElement selector="{{AdminBlockGridSection.editInSelect}}" time="30" stepKey="waitForElementEdit"/>
+        <click selector="{{AdminBlockGridSection.editInSelect}}" stepKey="clickEdit"/>
+        <waitForPageLoad stepKey="waitForEditPageLoad"/>
+        <click selector="{{AdminUpdateBlockSection.scheduleNewUpdate}}" stepKey="clickUpdate"/>
+        <waitForElement selector="{{AdminUpdateBlockSection.updateName}}" time="30" stepKey="waitForElement"/>
+        <fillField selector="{{AdminUpdateBlockSection.updateName}}" userInput="testUpdate" stepKey="fillUpdateName"/>
+        <generateDate stepKey="generateDate" date="+485 min" format="m/j/Y G:i A"/>
+        <fillField selector="{{AdminUpdateBlockSection.startDate}}" userInput="$generateDate" stepKey="fillStartDate"/>
+        <click selector="{{AdminUpdateBlockSection.isEnabled}}" stepKey="enableBlock"/>
+        <click selector="{{AdminUpdateBlockSection.saveUpdate}}" stepKey="saveUpdate"/>
+    </actionGroup>
+</actionGroups>

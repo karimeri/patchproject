@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="PageBuilderStagingDashboardOpenContentTypeEditForm">
+        <annotations>
+            <features value="PageBuilder"/>
+            <stories value="Staging Dashboard"/>
+            <title value="Edit Scheduled Update - Option Menu Edit Button Does Open Edit Form"/>
+            <description value="When user is on staging dashboard editing CMS content, the option menu edit button opens edit form"/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-5134"/>
+            <useCaseId value="MC-5069"/>
+            <group value="pagebuilder"/>
+            <group value="pagebuilder-ee"/>
+            <group value="pagebuilder-staging"/>
+            <group value="pagebuilder-staging-dashboard"/>
+        </annotations>
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+            <createData entity="_defaultCmsPage" stepKey="createCMSPage"/>
+            <actionGroup ref="navigateToCreatedCMSPage" stepKey="navigateToCreatedCMSPage">
+                <argument name="CMSPage" value="$$createCMSPage$$"/>
+            </actionGroup>
+        </before>
+        <after>
+            <actionGroup ref="logout" stepKey="logout"/>
+            <deleteData createDataKey="createCMSPage" stepKey="deletePreReqCMSPage" />
+        </after>
+        <!-- Create Schedule New Update -->
+        <comment userInput="Create Schedule New Update" stepKey="commentCreateScheduleNewUpdate"/>
+        <actionGroup ref="navigateToStagingSlideout" stepKey="openScheduleNewUpdate"/>
+        <actionGroup ref="FillScheduleUpdateBasicActionGroup" stepKey="createScheduleUpdate">
+            <argument name="schedule" value="UpdateWithoutEnd"/>
+        </actionGroup>
+        <!-- Open Content Staging Dashboard -->
+        <comment userInput="Open Content Staging Dashboard" stepKey="commentOpenContentStagingDashboard"/>
+        <actionGroup ref="navigateToViewStagingUpdateFromStagingDashboard" stepKey="navigateToViewStagingUpdateFromStagingDashboard">
+            <argument name="update" value="UpdateWithoutEnd"/>
+        </actionGroup>
+        <actionGroup ref="openEditSlideOutForCMSPagesStagingUpdateFromViewStagingUpdate" stepKey="openEditSlideOutForCMSPagesStagingUpdateFromViewStagingUpdate"/>
+        <click selector="{{AdminStagingDashboardSection.contentHeader}}" stepKey="clickContentSectionHeader"/>
+        <waitForPageLoad time="30" stepKey="waitForCMSPageContent"/>
+        <!-- Confirm Edit Panel Opens -->
+        <comment userInput="Confirm Edit Panel Opens" stepKey="commentConfirmEditPanelOpens"/>
+        <actionGroup ref="openPageBuilderEditPanel" stepKey="openEditMenuOnStage">
+            <argument name="contentType" value="PageBuilderRowContentType"/>
+        </actionGroup>
+    </test>
+</tests>

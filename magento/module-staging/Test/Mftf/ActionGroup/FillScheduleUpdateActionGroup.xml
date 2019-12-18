@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="FillScheduleUpdateActionGroup">
+        <arguments>
+            <argument name="staging"/>
+            <argument name="timeStart" type="string"/>
+            <argument name="timeEnd" defaultValue="" type="string"/>
+            <argument name="productPrice" defaultValue="10" type="string"/>
+        </arguments>
+        <conditionalClick selector="{{AdminStagingSlideOutSection.scheduleNewUpdateBtn}}" dependentSelector="{{AdminStagingSlideOutSection.updateName}}" visible="false" stepKey="clickNewUpdate"/>
+        <waitForPageLoad stepKey="waitForLoading"/>
+        <fillField selector="{{AdminStagingSlideOutSection.updateName}}" userInput="{{staging.updateName}}" stepKey="fillUpdateName"/>
+        <fillField selector="{{AdminStagingSlideOutSection.updateDescription}}" userInput="{{staging.updateDescription}}" stepKey="fillDescription"/>
+        <fillField selector="{{AdminStagingSlideOutSection.startDate}}" userInput="{{timeStart}}" stepKey="fillStartDate"/>
+        <fillField selector="{{AdminStagingSlideOutSection.endDate}}" userInput="{{timeEnd}}" stepKey="fillEndDate"/>
+        <fillField selector="{{AdminCatalogStagingSlideOutSection.productPrice}}" userInput="{{productPrice}}" stepKey="fillProductPrice"/>
+        <click selector="{{AdminStagingSlideOutSection.save}}" stepKey="clickSave"/>
+    </actionGroup>
+    <actionGroup name="FillScheduleUpdateWithCheckActionGroup" extends="FillScheduleUpdateActionGroup">
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(staging.updateName)}}" userInput="{{staging.updateName}}" stepKey="seeUpdateName"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(staging.updateDescription)}}" userInput="{{staging.updateDescription}}" stepKey="seeUpdateDescription"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleViewEdit(staging.updateName)}}" userInput="View/Edit" stepKey="seeUpdateViewAneEdit"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleActions(staging.updateName, 'Preview')}}" userInput="Preview" stepKey="seeUpdatePreview"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleLabel('Start')}}" userInput="Start" stepKey="seeStart"/>
+    </actionGroup>
+    <actionGroup name="FillScheduleUpdateWithCheckEndActionGroup" extends="FillScheduleUpdateActionGroup">
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(staging.updateName)}}" userInput="{{staging.updateName}}" stepKey="seeUpdateName"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleDetails(staging.updateDescription)}}" userInput="{{staging.updateDescription}}" stepKey="seeUpdateDescription"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleViewEdit(staging.updateName)}}" userInput="View/Edit" stepKey="seeUpdateViewAndEdit"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleActions(staging.updateName, 'Preview')}}" userInput="Preview" stepKey="seeUpdatePreview"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleLabel('Start')}}" userInput="Start" stepKey="seeStart"/>
+        <see selector="{{AdminScheduledChangesSection.scheduleLabel('End')}}" userInput="End" stepKey="seeEnd"/>
+    </actionGroup>
+    <actionGroup name="EditSheduleUpdateActionGroup">
+        <arguments>
+            <argument name="staging"/>
+            <argument name="timeStart" type="string"/>
+            <argument name="timeEnd" defaultValue="" type="string"/>
+        </arguments>
+        <fillField selector="{{AdminStagingEditSection.updateName}}" userInput="{{staging.updateName}}" stepKey="changeUpdateName"/>
+        <fillField selector="{{AdminStagingEditSection.updateDescription}}" userInput="{{staging.updateDescription}}" stepKey="changeUpdateDescription"/>
+        <fillField selector="{{AdminStagingEditSection.startDate}}" userInput="{{timeStart}}" stepKey="changeUpdateStart"/>
+        <fillField selector="{{AdminStagingEditSection.endDate}}" userInput="{{timeEnd}}" stepKey="fillUpdateEnd"/>
+        <click selector="{{AdminMainActionsSection.save}}" stepKey="clickSave"/>
+    </actionGroup>
+    <actionGroup name="FillScheduleUpdateRemovePriceActionGroup" extends="FillScheduleUpdateActionGroup">
+        <remove keyForRemoval="fillProductPrice"/>
+    </actionGroup>
+</actionGroups>
